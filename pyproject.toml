@@ -1,0 +1,41 @@
+# pyproject.toml
+
+[build-system]
+requires = [
+  "hatchling>=1.27.0,<2.0",
+  "hatch-vcs>=0.4.0,<0.5.0"
+]
+build-backend = "hatchling.build"
+
+[project]
+name = "proximity_fear"
+version = "0.1"
+description = "Proximity fear badge: three LED rings that beat faster as people get closer"
+dependencies = [
+  "jitx>=4.6,<4.7",
+  "jitxlib-standard>=4.6,<4.7",
+  "jitxlib-parts>=2,<3",
+  "jitxlib-jlcpcb>=4,<5",
+  "jitx-warp-integration @ file:///Users/jrb/jitx-warp-integration",
+]
+requires-python = ">=3.12"
+
+[tool.jitx.parts]
+# Passives resolve from JLCPCB's assembly catalogue (stand-in until the
+# Phase 4 parts gate, as on socialbadge-ai).
+chain = ["jlcpcb"]
+
+[tool.ruff]
+line-length = 120
+
+[tool.ruff.lint]
+extend-select = ["E", "F", "W", "I", "UP", "B", "RUF"]
+
+[tool.ruff.lint.per-file-ignores]
+# Class-body port arrays are JITX's declaration model.
+"proximity_fear/components/**/*.py" = ["RUF012"]
+
+[tool.pyright]
+venvPath = "."
+venv = ".venv"
+include = ["proximity_fear", "scripts"]

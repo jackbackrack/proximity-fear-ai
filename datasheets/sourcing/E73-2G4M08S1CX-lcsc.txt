@@ -1,0 +1,7 @@
+LCSC/EasyEDA channel record for C2764963 (fetched 2026-11-15 from https://easyeda.com/api/products/C2764963/components)
+Title: E73-2G4M08S1CX; Manufacturer: EBYTE; Manufacturer Part: E73-2G4M08S1CX; JLCPCB Part Class: Extended Part; package BULETM-SMD_E73-2G4M08S1CX
+Stock: 978 at JLC per PLAN.md Data Sources (Phase 0 audit); lifecycle: active (listed, orderable)
+Datasheet: Ebyte E73-2G4M08S1CX User Manual v1.2 (datasheets/E73-2G4M08S1CX.pdf)
+Symbol pin labels (pin:name):
+1:P1.11 2:P1.10 3:P0.03 4:AI4 5:GND 6:P1.13 7:AI0 8:AI5 9:AI7 10:AI6 11:XL1 12:P0.26 13:XL2 14:P0.06 15:AI3 16:P0.08 17:P1.09 18:AI2 19:VCC 20:P12 21:GND 22:P0.07 23:VDH 24:GND 25:DCH 26:RST 27:VBS 28:P15 29:D- 30:P17 31:D+ 32:P0.20 33:P0.13 34:P0.22 35:P0.24 36:P1.00 37:SWD 38:P1.02 39:SWC 40:P1.04 41:NF1 42:P1.06 43:NF2
+Cross-check: identical to Ebyte manual pin table pp.7-9 for all 43 pins.

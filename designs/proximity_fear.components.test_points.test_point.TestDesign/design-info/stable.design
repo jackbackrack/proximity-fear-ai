@@ -1,0 +1,24 @@
+{
+  "entries": [
+    {"tag":"instantiation","def-id":"AFRJaNqvArRUQYXwqvsyBZ","inst-id":"4M7Bv9cRq7KxBLK9eBvk5h"},
+    {"tag":"instantiation","def-id":0,"inst-id":"9FVoqoNBonAKxeHzLTMZEV"},
+    {"tag":"instantiation","def-id":"3WPgCxyQiWicc2pGzXDhPZ","inst-id":"AshGRiipETo4R2rtq66set"},
+    {"tag":"package-contains-pad","pkg-id":"9DiJavcKPQbKsqC5dE3mwa","pad-id":"4M7Bv9cRq7KxBLK9eBvk5h"},
+    {"tag":"def-pin-uses-pad","pin-id":0,"pad-id":"4M7Bv9cRq7KxBLK9eBvk5h","index":0},
+    {"tag":"component-has-pin","def-id":"3WPgCxyQiWicc2pGzXDhPZ","pin-id":0},
+    {"tag":"component-uses-package","component-id":"3WPgCxyQiWicc2pGzXDhPZ","package-id":"9DiJavcKPQbKsqC5dE3mwa"},
+    {"tag":"inst-contains","parent-id":"AshGRiipETo4R2rtq66set","child-id":"9FVoqoNBonAKxeHzLTMZEV"},
+    {"tag":"inst-contains","parent-id":"7rqGDaKgYEZ44L8L2HMeQe","child-id":"AshGRiipETo4R2rtq66set"},
+    {"tag":"package-pad","id":"4M7Bv9cRq7KxBLK9eBvk5h","ref":{"name":"p1"},"pose":{"center":{"x":"11111111","y":"11111111"},"angle":"11111111","flip-x?":false},"side":"Top"},
+    {"tag":"via-def","id":1,"name":"THVia"},
+    {"tag":"via-def","id":2,"name":"MicroVia"},
+    {"tag":"pad-def","id":"AFRJaNqvArRUQYXwqvsyBZ","name":"SMDPad","shape":{"type":"circle","center":{"x":"11111111","y":"11111111"},"radius":"BgnkTCPaKht"},"type":"SMD"},
+    {"tag":"package","id":"9DiJavcKPQbKsqC5dE3mwa","name":"TestPointLandpattern","package-hash":-1420502411},
+    {"tag":"def-pin","id":0},
+    {"tag":"component","id":"3WPgCxyQiWicc2pGzXDhPZ","name":"TestPoint","reference-prefix":"TP"},
+    {"tag":"symbol","id":3},
+    {"tag":"pin","id":"9FVoqoNBonAKxeHzLTMZEV","ref":{"ref":{"name":"dut"},"field":{"name":"p1"}}},
+    {"tag":"component-inst","id":"AshGRiipETo4R2rtq66set","public?":true,"ref":{"name":"dut"},"schematic-groups":[],"explicit-designator":null},
+    {"tag":"top-module-inst","id":"7rqGDaKgYEZ44L8L2HMeQe","def-name":"circuit"}
+  ]
+}

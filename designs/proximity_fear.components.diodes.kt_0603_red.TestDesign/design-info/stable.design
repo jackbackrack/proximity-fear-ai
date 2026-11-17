@@ -1,0 +1,33 @@
+{
+  "entries": [
+    {"tag":"instantiation","def-id":"BkWs5iPrLZXPdaLznFpqi5","inst-id":"GbcTLaPkRXKHC5QXA1Rri5"},
+    {"tag":"instantiation","def-id":"BkWs5iPrLZXPdaLznFpqi5","inst-id":"7u84aoucRqT9CFWdgoTrtB"},
+    {"tag":"instantiation","def-id":0,"inst-id":"BKfFeDWMRvbvU7nVSkR9Bv"},
+    {"tag":"instantiation","def-id":1,"inst-id":"GPQe6UxJVHjLcJYoijagaj"},
+    {"tag":"instantiation","def-id":"Fqvkn7eGTmpoUYRT7RzVUk","inst-id":"7m1iD2FPCPGf1hoeaKxKry"},
+    {"tag":"package-contains-pad","pkg-id":"99oMFAfc7CMYbgHmrP6k1S","pad-id":"GbcTLaPkRXKHC5QXA1Rri5"},
+    {"tag":"package-contains-pad","pkg-id":"99oMFAfc7CMYbgHmrP6k1S","pad-id":"7u84aoucRqT9CFWdgoTrtB"},
+    {"tag":"def-pin-uses-pad","pin-id":1,"pad-id":"GbcTLaPkRXKHC5QXA1Rri5","index":0},
+    {"tag":"component-has-pin","def-id":"Fqvkn7eGTmpoUYRT7RzVUk","pin-id":1},
+    {"tag":"def-pin-uses-pad","pin-id":0,"pad-id":"7u84aoucRqT9CFWdgoTrtB","index":0},
+    {"tag":"component-has-pin","def-id":"Fqvkn7eGTmpoUYRT7RzVUk","pin-id":0},
+    {"tag":"component-uses-package","component-id":"Fqvkn7eGTmpoUYRT7RzVUk","package-id":"99oMFAfc7CMYbgHmrP6k1S"},
+    {"tag":"inst-contains","parent-id":"7m1iD2FPCPGf1hoeaKxKry","child-id":"BKfFeDWMRvbvU7nVSkR9Bv"},
+    {"tag":"inst-contains","parent-id":"7m1iD2FPCPGf1hoeaKxKry","child-id":"GPQe6UxJVHjLcJYoijagaj"},
+    {"tag":"inst-contains","parent-id":"bmiMrEhdjg3h2N65aW1pV","child-id":"7m1iD2FPCPGf1hoeaKxKry"},
+    {"tag":"package-pad","id":"GbcTLaPkRXKHC5QXA1Rri5","ref":{"ref":{"name":"p"},"index":2},"pose":{"center":{"x":"Z6jQ96hskgo","y":"11111111"},"angle":"11111111","flip-x?":false},"side":"Top"},
+    {"tag":"package-pad","id":"7u84aoucRqT9CFWdgoTrtB","ref":{"ref":{"name":"p"},"index":1},"pose":{"center":{"x":"BgyJMmtjvSb","y":"11111111"},"angle":"11111111","flip-x?":false},"side":"Top"},
+    {"tag":"via-def","id":2,"name":"THVia"},
+    {"tag":"via-def","id":3,"name":"MicroVia"},
+    {"tag":"pad-def","id":"BkWs5iPrLZXPdaLznFpqi5","name":"Pad1","shape":{"type":"polygon","points":[{"x":"BgRee3PF8EV","y":"BgRee3PF8EV"},{"x":"Z6BkRNCNxUh","y":"BgRee3PF8EV"},{"x":"Z6BkRNCNxUh","y":"Z6BkRNCNxUh"},{"x":"BgRee3PF8EV","y":"Z6BkRNCNxUh"}]},"type":"SMD"},
+    {"tag":"package","id":"99oMFAfc7CMYbgHmrP6k1S","name":"_Landpattern","package-hash":620063069},
+    {"tag":"def-pin","id":0},
+    {"tag":"def-pin","id":1},
+    {"tag":"component","id":"Fqvkn7eGTmpoUYRT7RzVUk","name":"KT_0603R","reference-prefix":"D"},
+    {"tag":"symbol","id":4},
+    {"tag":"pin","id":"BKfFeDWMRvbvU7nVSkR9Bv","ref":{"ref":{"name":"dut"},"field":{"name":"A"}}},
+    {"tag":"pin","id":"GPQe6UxJVHjLcJYoijagaj","ref":{"ref":{"name":"dut"},"field":{"name":"K"}}},
+    {"tag":"component-inst","id":"7m1iD2FPCPGf1hoeaKxKry","public?":true,"ref":{"name":"dut"},"schematic-groups":[],"explicit-designator":null},
+    {"tag":"top-module-inst","id":"bmiMrEhdjg3h2N65aW1pV","def-name":"circuit"}
+  ]
+}

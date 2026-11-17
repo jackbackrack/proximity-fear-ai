@@ -1,0 +1,58 @@
+{
+  "version": 3,
+  "assignments": [
+  ],
+  "id-mapping": {
+    "boxes": [
+      [{"id":"111111111DsnL4KbHh","unit-id":0},4],
+      [{"id":"9DjBrYPFv194sFmpbfHif1","unit-id":0},9]
+    ],
+    "inst-boxes": [
+      [{"id":"39gnWV3ciZzJAy9DCTF8Bv","unit-id":0},10]
+    ],
+    "annotation-boxes": [
+    ],
+    "nets": [
+    ],
+    "ports": [
+      ["111111111Dso9P6vZk",0],
+      ["111111111DsoFhsDxG",1],
+      ["111111111DsoMhHCrH",2],
+      ["111111111DsoTk6gNt",3],
+      ["111111111DsnhL5ZTx",5],
+      ["111111111DsnSjHCgf",6],
+      ["111111111Dsno3mHpt",7],
+      ["111111111DsnYKPiQG",8]
+    ]
+  },
+  "design": {
+    "input": {
+      "paper-size": {
+        "x": 200,
+        "y": 125
+      },
+      "label-style": {
+        "type": "monospace-label-style",
+        "height-in-grid-units": 0.8,
+        "char-width-relative-to-height": 0.6
+      },
+      "boxes": [
+        {"id":4,"sw":{"x":-6,"y":-6},"ne":{"x":6,"y":6},"ports":[{"id":0,"pt":{"x":6,"y":1},"dir":"Right","tag":"AnyTag"},{"id":1,"pt":{"x":6,"y":-1},"dir":"Right","tag":"AnyTag"},{"id":2,"pt":{"x":-6,"y":1},"dir":"Left","tag":"AnyTag"},{"id":3,"pt":{"x":-6,"y":-1},"dir":"Left","tag":"AnyTag"}],"orientation":{"type":"prefer-rotation","rotations":[0]}},
+        {"id":9,"sw":{"x":-6,"y":-6},"ne":{"x":6,"y":6},"ports":[{"id":5,"pt":{"x":6,"y":1},"dir":"Right","tag":"AnyTag"},{"id":6,"pt":{"x":6,"y":-1},"dir":"Right","tag":"AnyTag"},{"id":7,"pt":{"x":-6,"y":1},"dir":"Left","tag":"AnyTag"},{"id":8,"pt":{"x":-6,"y":-1},"dir":"Left","tag":"AnyTag"}],"orientation":{"type":"prefer-rotation","rotations":[0]}}
+      ],
+      "insts": [
+        {"id":10,"box":9,"group":null}
+      ],
+      "nets": [
+      ],
+      "shorts": [
+      ],
+      "schematic-group-order": [
+      ]
+    },
+    "sheets": [
+      {"id":12,"title":null,"groups":[{"id":11,"groups":[null],"border":{"sw":{"x":92,"y":54},"ne":{"x":108,"y":70}},"insts":[{"inst":10,"pose":{"center":{"x":100,"y":62},"angle":0,"flip-x?":false}}],"children":[]}],"nets":[]}
+    ],
+    "hierarchical-diagram": null
+  }
+}

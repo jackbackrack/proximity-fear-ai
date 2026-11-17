@@ -1,0 +1,33 @@
+{
+  "entries": [
+    {"tag":"instantiation","def-id":"9zcu3R32hrBSXUfEeP7zGz","inst-id":"8MeDfgQVh7tNQD75Aw38HM"},
+    {"tag":"instantiation","def-id":"9zcu3R32hrBSXUfEeP7zGz","inst-id":"E8Ug5wFgVgup3KPWh2Mrsp"},
+    {"tag":"instantiation","def-id":0,"inst-id":"DtSvxEwKCvgS7nT5MgwUY7"},
+    {"tag":"instantiation","def-id":1,"inst-id":"38JrSFn6Yzmt2kgE3HN2Wg"},
+    {"tag":"instantiation","def-id":"BJNagHJGh1r3Vsi3CQFQZc","inst-id":"DPrw24ynA7E8su26YaJQLr"},
+    {"tag":"package-contains-pad","pkg-id":"BTavihThUAXk5WAVg6RVxb","pad-id":"8MeDfgQVh7tNQD75Aw38HM"},
+    {"tag":"package-contains-pad","pkg-id":"BTavihThUAXk5WAVg6RVxb","pad-id":"E8Ug5wFgVgup3KPWh2Mrsp"},
+    {"tag":"def-pin-uses-pad","pin-id":1,"pad-id":"8MeDfgQVh7tNQD75Aw38HM","index":0},
+    {"tag":"component-has-pin","def-id":"BJNagHJGh1r3Vsi3CQFQZc","pin-id":1},
+    {"tag":"def-pin-uses-pad","pin-id":0,"pad-id":"E8Ug5wFgVgup3KPWh2Mrsp","index":0},
+    {"tag":"component-has-pin","def-id":"BJNagHJGh1r3Vsi3CQFQZc","pin-id":0},
+    {"tag":"component-uses-package","component-id":"BJNagHJGh1r3Vsi3CQFQZc","package-id":"BTavihThUAXk5WAVg6RVxb"},
+    {"tag":"inst-contains","parent-id":"DPrw24ynA7E8su26YaJQLr","child-id":"DtSvxEwKCvgS7nT5MgwUY7"},
+    {"tag":"inst-contains","parent-id":"DPrw24ynA7E8su26YaJQLr","child-id":"38JrSFn6Yzmt2kgE3HN2Wg"},
+    {"tag":"inst-contains","parent-id":"Et58v3hq7NzMP997iH417X","child-id":"DPrw24ynA7E8su26YaJQLr"},
+    {"tag":"package-pad","id":"8MeDfgQVh7tNQD75Aw38HM","ref":{"ref":{"name":"p"},"index":2},"pose":{"center":{"x":"Z7ck5ukcbsR","y":"11111111"},"angle":"11111111","flip-x?":false},"side":"Top"},
+    {"tag":"package-pad","id":"E8Ug5wFgVgup3KPWh2Mrsp","ref":{"ref":{"name":"p"},"index":1},"pose":{"center":{"x":"BhreJawUmdD","y":"11111111"},"angle":"11111111","flip-x?":false},"side":"Top"},
+    {"tag":"via-def","id":2,"name":"THVia"},
+    {"tag":"via-def","id":3,"name":"MicroVia"},
+    {"tag":"pad-def","id":"9zcu3R32hrBSXUfEeP7zGz","name":"Pad1","shape":{"type":"polygon","points":[{"x":"Bgz19p8HVh3","y":"Bh5dW7ze5gc"},{"x":"Z6k6w8wRKwF","y":"Bh5dW7ze5gc"},{"x":"Z6k6w8wRKwF","y":"Z6qjHSomuvp"},{"x":"Bgz19p8HVh3","y":"Z6qjHSomuvp"}]},"type":"SMD"},
+    {"tag":"package","id":"BTavihThUAXk5WAVg6RVxb","name":"_Landpattern","package-hash":646617405},
+    {"tag":"def-pin","id":0},
+    {"tag":"def-pin","id":1},
+    {"tag":"component","id":"BJNagHJGh1r3Vsi3CQFQZc","name":"SS14","reference-prefix":"D"},
+    {"tag":"symbol","id":4},
+    {"tag":"pin","id":"DtSvxEwKCvgS7nT5MgwUY7","ref":{"ref":{"name":"dut"},"field":{"name":"A"}}},
+    {"tag":"pin","id":"38JrSFn6Yzmt2kgE3HN2Wg","ref":{"ref":{"name":"dut"},"field":{"name":"K"}}},
+    {"tag":"component-inst","id":"DPrw24ynA7E8su26YaJQLr","public?":true,"ref":{"name":"dut"},"schematic-groups":[],"explicit-designator":null},
+    {"tag":"top-module-inst","id":"Et58v3hq7NzMP997iH417X","def-name":"circuit"}
+  ]
+}

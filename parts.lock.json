@@ -1,0 +1,1728 @@
+{
+ "schema_version": 1,
+ "digest_version": 1,
+ "chains": {
+  "main": {
+   "digest": "78e0877fced9897dbddba5c080ab36af4fcf283b4d438b2b3a65485b504496aa",
+   "providers": [
+    "jlcpcb"
+   ]
+  }
+ },
+ "entries": [
+  {
+   "digest": "d6c15c2a80eeed5b6b9ae75f95f8b1f251c8bc4299f1925edc8c950336604c03",
+   "chain": "main",
+   "lock_scope": "",
+   "query": "capacitor(capacitance=1e-08 farad, case=OneOf(0402, 0603, 0805), rated_voltage_dc=>=10.0 volt, temperature_coefficient_code=X7R, rank=(min(case)))",
+   "filters": {
+    "capacitance": [
+     "Exactly",
+     [
+      "q",
+      "1e-08 farad"
+     ]
+    ],
+    "case": [
+     "OneOf",
+     [
+      "0402",
+      "0603",
+      "0805"
+     ]
+    ],
+    "rated_voltage_dc": [
+     "Range",
+     [
+      "q",
+      "10.0 volt"
+     ],
+     null
+    ],
+    "temperature_coefficient_code": [
+     "Exactly",
+     "X7R"
+    ]
+   },
+   "provider": "jlcpcb",
+   "identity": {
+    "mpn": "0402B103K500NT",
+    "manufacturer": "FH (Guangdong Fenghua Advanced Tech)",
+    "category": "capacitor",
+    "provider": "jlcpcb",
+    "attributes": {
+     "capacitance": [
+      "q",
+      "10.0 nanofarad"
+     ],
+     "case": "0402",
+     "lcsc": "C1524",
+     "library": "extended",
+     "rated_voltage_dc": [
+      "q",
+      "50.0 volt"
+     ],
+     "temperature_coefficient_code": "X7R",
+     "tolerance": 0.1
+    },
+    "provider_ref": "C1524"
+   },
+   "payload": {
+    "v": 1,
+    "datasheet": "https://www.lcsc.com/datasheet/lcsc_datasheet_2304140030_FH--Guangdong-Fenghua-Advanced-Tech-0402B103K500NT_C1524.pdf",
+    "description": "10nF 50V X7R \u00b110% 0402 Multilayer Ceramic Capacitors MLCC - SMD/SMT ROHS",
+    "stock": 3117404,
+    "price": 0.0022,
+    "min_order_qty": 1,
+    "min_assembly_qty": 20,
+    "product_url": "https://jlcpcb.com/partdetail/C1524"
+   }
+  },
+  {
+   "digest": "e27bc77eb0d84a2d3a7422bf50565ddb63d14dfc2d7811da3ba00111f8c0d3fc",
+   "chain": "main",
+   "lock_scope": "",
+   "query": "capacitor(capacitance=10 picofarad, case=0402, rated_voltage_dc=>=25 volt, temperature_coefficient_code=C0G, rank=(min(case)))",
+   "filters": {
+    "capacitance": [
+     "Exactly",
+     [
+      "q",
+      "10 picofarad"
+     ]
+    ],
+    "case": [
+     "Exactly",
+     "0402"
+    ],
+    "rated_voltage_dc": [
+     "Range",
+     [
+      "q",
+      "25 volt"
+     ],
+     null
+    ],
+    "temperature_coefficient_code": [
+     "Exactly",
+     "C0G"
+    ]
+   },
+   "provider": "jlcpcb",
+   "identity": {
+    "mpn": "0402CG100J500NT",
+    "manufacturer": "FH (Guangdong Fenghua Advanced Tech)",
+    "category": "capacitor",
+    "provider": "jlcpcb",
+    "attributes": {
+     "capacitance": [
+      "q",
+      "10.0 picofarad"
+     ],
+     "case": "0402",
+     "lcsc": "C1545",
+     "library": "extended",
+     "rated_voltage_dc": [
+      "q",
+      "50.0 volt"
+     ],
+     "temperature_coefficient_code": "C0G",
+     "tolerance": 0.05
+    },
+    "provider_ref": "C1545"
+   },
+   "payload": {
+    "v": 1,
+    "datasheet": "https://www.lcsc.com/datasheet/lcsc_datasheet_2304140030_FH--Guangdong-Fenghua-Advanced-Tech-0402CG100J500NT_C1545.pdf",
+    "description": "10pF 50V C0G \u00b15% 0402 Multilayer Ceramic Capacitors MLCC - SMD/SMT ROHS",
+    "stock": 419005,
+    "price": 0.0023,
+    "min_order_qty": 1,
+    "min_assembly_qty": 20,
+    "product_url": "https://jlcpcb.com/partdetail/C1545"
+   }
+  },
+  {
+   "digest": "4f55e1e35c7c708593d3ca1b23e567204812c48611854ab3b98139bb4f4e07d1",
+   "chain": "main",
+   "lock_scope": "",
+   "query": "capacitor(capacitance=16 picofarad, case=OneOf(0402, 0603, 0805), rated_voltage_dc=>=25 volt, temperature_coefficient_code=C0G, tolerance=<=0.05, rank=(min(case)))",
+   "filters": {
+    "capacitance": [
+     "Exactly",
+     [
+      "q",
+      "16 picofarad"
+     ]
+    ],
+    "case": [
+     "OneOf",
+     [
+      "0402",
+      "0603",
+      "0805"
+     ]
+    ],
+    "rated_voltage_dc": [
+     "Range",
+     [
+      "q",
+      "25 volt"
+     ],
+     null
+    ],
+    "temperature_coefficient_code": [
+     "Exactly",
+     "C0G"
+    ],
+    "tolerance": [
+     "Range",
+     null,
+     0.05
+    ]
+   },
+   "provider": "jlcpcb",
+   "identity": {
+    "mpn": "0402CG160J500NT",
+    "manufacturer": "FH (Guangdong Fenghua Advanced Tech)",
+    "category": "capacitor",
+    "provider": "jlcpcb",
+    "attributes": {
+     "capacitance": [
+      "q",
+      "16.0 picofarad"
+     ],
+     "case": "0402",
+     "lcsc": "C48836",
+     "library": "extended",
+     "rated_voltage_dc": [
+      "q",
+      "50.0 volt"
+     ],
+     "temperature_coefficient_code": "C0G",
+     "tolerance": 0.05
+    },
+    "provider_ref": "C48836"
+   },
+   "payload": {
+    "v": 1,
+    "datasheet": "https://wmsc.lcsc.com/wmsc/upload/file/pdf/v2/lcsc/2304140030_FH--Guangdong-Fenghua-Advanced-Tech-0402CG160J500NT_C48836.pdf",
+    "description": "16pF 50V C0G \u00b15% 0402 Multilayer Ceramic Capacitors MLCC - SMD/SMT ROHS",
+    "stock": 62018,
+    "price": 0.0034,
+    "min_order_qty": 1,
+    "min_assembly_qty": 20,
+    "product_url": "https://jlcpcb.com/partdetail/C48836"
+   }
+  },
+  {
+   "digest": "002bc14cd2afbc87a7faf836b518f651c593d9534035f4f0647e7eaa86b5321d",
+   "chain": "main",
+   "lock_scope": "",
+   "query": "capacitor(capacitance=1e-05 farad, case=OneOf(0402, 0603, 0805), rated_voltage_dc=>=16.0 volt, temperature_coefficient_code=X5R, rank=(min(case)))",
+   "filters": {
+    "capacitance": [
+     "Exactly",
+     [
+      "q",
+      "1e-05 farad"
+     ]
+    ],
+    "case": [
+     "OneOf",
+     [
+      "0402",
+      "0603",
+      "0805"
+     ]
+    ],
+    "rated_voltage_dc": [
+     "Range",
+     [
+      "q",
+      "16.0 volt"
+     ],
+     null
+    ],
+    "temperature_coefficient_code": [
+     "Exactly",
+     "X5R"
+    ]
+   },
+   "provider": "jlcpcb",
+   "identity": {
+    "mpn": "0603X106K160NT",
+    "manufacturer": "FH (Guangdong Fenghua Advanced Tech)",
+    "category": "capacitor",
+    "provider": "jlcpcb",
+    "attributes": {
+     "capacitance": [
+      "q",
+      "10.0 microfarad"
+     ],
+     "case": "0603",
+     "lcsc": "C70225",
+     "library": "extended",
+     "rated_voltage_dc": [
+      "q",
+      "16.0 volt"
+     ],
+     "temperature_coefficient_code": "X5R",
+     "tolerance": 0.1
+    },
+    "provider_ref": "C70225"
+   },
+   "payload": {
+    "v": 1,
+    "datasheet": "https://www.lcsc.com/datasheet/lcsc_datasheet_2304121200_FH--Guangdong-Fenghua-Advanced-Tech-0603X106K160NT_C70225.pdf",
+    "description": "10uF 16V X5R \u00b110% 0603 Multilayer Ceramic Capacitors MLCC - SMD/SMT ROHS",
+    "stock": 159232,
+    "price": 0.0329,
+    "min_order_qty": 1,
+    "min_assembly_qty": 20,
+    "product_url": "https://jlcpcb.com/partdetail/C70225"
+   }
+  },
+  {
+   "digest": "5f89ada04c5e34c0b1e0ea84e505a9d404b8986b9a79064bf2a8584a558f2493",
+   "chain": "main",
+   "lock_scope": "",
+   "query": "capacitor(capacitance=82 picofarad, case=OneOf(0402, 0603, 0805), rated_voltage_dc=>=25 volt, temperature_coefficient_code=C0G, tolerance=<=0.02, rank=(min(case)))",
+   "filters": {
+    "capacitance": [
+     "Exactly",
+     [
+      "q",
+      "82 picofarad"
+     ]
+    ],
+    "case": [
+     "OneOf",
+     [
+      "0402",
+      "0603",
+      "0805"
+     ]
+    ],
+    "rated_voltage_dc": [
+     "Range",
+     [
+      "q",
+      "25 volt"
+     ],
+     null
+    ],
+    "temperature_coefficient_code": [
+     "Exactly",
+     "C0G"
+    ],
+    "tolerance": [
+     "Range",
+     null,
+     0.02
+    ]
+   },
+   "provider": "jlcpcb",
+   "identity": {
+    "mpn": "GRM1555C1H820FA01D",
+    "manufacturer": "Murata Electronics",
+    "category": "capacitor",
+    "provider": "jlcpcb",
+    "attributes": {
+     "capacitance": [
+      "q",
+      "82.0 picofarad"
+     ],
+     "case": "0402",
+     "lcsc": "C162123",
+     "library": "extended",
+     "rated_voltage_dc": [
+      "q",
+      "50.0 volt"
+     ],
+     "temperature_coefficient_code": "C0G",
+     "tolerance": 0.01
+    },
+    "provider_ref": "C162123"
+   },
+   "payload": {
+    "v": 1,
+    "datasheet": "https://www.lcsc.com/datasheet/lcsc_datasheet_2304140030_Murata-Electronics-GRM1555C1H820FA01D_C162123.pdf",
+    "description": "50V 82pF C0G \u00b11% 0402 Multilayer Ceramic Capacitors MLCC - SMD/SMT ROHS",
+    "stock": 80812,
+    "price": 0.014,
+    "min_order_qty": 1,
+    "min_assembly_qty": 20,
+    "product_url": "https://jlcpcb.com/partdetail/C162123"
+   }
+  },
+  {
+   "digest": "3256168b99bece8af8d906860e4902ad94132401639996ec5c78fa69547b83da",
+   "chain": "main",
+   "lock_scope": "",
+   "query": "capacitor(capacitance=1e-05 farad, case=OneOf(0402, 0603, 0805), rated_voltage_dc=>=10.0 volt, temperature_coefficient_code=X5R, rank=(min(case)))",
+   "filters": {
+    "capacitance": [
+     "Exactly",
+     [
+      "q",
+      "1e-05 farad"
+     ]
+    ],
+    "case": [
+     "OneOf",
+     [
+      "0402",
+      "0603",
+      "0805"
+     ]
+    ],
+    "rated_voltage_dc": [
+     "Range",
+     [
+      "q",
+      "10.0 volt"
+     ],
+     null
+    ],
+    "temperature_coefficient_code": [
+     "Exactly",
+     "X5R"
+    ]
+   },
+   "provider": "jlcpcb",
+   "identity": {
+    "mpn": "GRM155R61A106ME44D",
+    "manufacturer": "Murata Electronics",
+    "category": "capacitor",
+    "provider": "jlcpcb",
+    "attributes": {
+     "capacitance": [
+      "q",
+      "10.0 microfarad"
+     ],
+     "case": "0402",
+     "lcsc": "C77000",
+     "library": "extended",
+     "rated_voltage_dc": [
+      "q",
+      "10.0 volt"
+     ],
+     "temperature_coefficient_code": "X5R",
+     "tolerance": 0.2
+    },
+    "provider_ref": "C77000"
+   },
+   "payload": {
+    "v": 1,
+    "datasheet": "https://www.lcsc.com/datasheet/lcsc_datasheet_1811141510_Murata-Electronics-GRM155R61A106ME44D_C77000.pdf",
+    "description": "10V 10uF X5R \u00b120% 0402 Multilayer Ceramic Capacitors MLCC - SMD/SMT ROHS",
+    "stock": 520316,
+    "price": 0.0213,
+    "min_order_qty": 1,
+    "min_assembly_qty": 20,
+    "product_url": "https://jlcpcb.com/partdetail/C77000"
+   }
+  },
+  {
+   "digest": "fa651a332d072f806657a4bdecde152bbf4bb157a5e896ff698885373a59899d",
+   "chain": "main",
+   "lock_scope": "",
+   "query": "capacitor(capacitance=1 microfarad, case=OneOf(0402, 0603, 0805), rated_voltage_dc=>=10 volt, temperature_coefficient_code=X5R, rank=(min(case)))",
+   "filters": {
+    "capacitance": [
+     "Exactly",
+     [
+      "q",
+      "1 microfarad"
+     ]
+    ],
+    "case": [
+     "OneOf",
+     [
+      "0402",
+      "0603",
+      "0805"
+     ]
+    ],
+    "rated_voltage_dc": [
+     "Range",
+     [
+      "q",
+      "10 volt"
+     ],
+     null
+    ],
+    "temperature_coefficient_code": [
+     "Exactly",
+     "X5R"
+    ]
+   },
+   "provider": "jlcpcb",
+   "identity": {
+    "mpn": "CL05A105KP5NNNC",
+    "manufacturer": "Samsung Electro-Mechanics",
+    "category": "capacitor",
+    "provider": "jlcpcb",
+    "attributes": {
+     "capacitance": [
+      "q",
+      "1.0 microfarad"
+     ],
+     "case": "0402",
+     "lcsc": "C14445",
+     "library": "extended",
+     "rated_voltage_dc": [
+      "q",
+      "10.0 volt"
+     ],
+     "temperature_coefficient_code": "X5R",
+     "tolerance": 0.1
+    },
+    "provider_ref": "C14445"
+   },
+   "payload": {
+    "v": 1,
+    "datasheet": "https://www.lcsc.com/datasheet/lcsc_datasheet_2304140030_Samsung-Electro-Mechanics-CL05A105KP5NNNC_C14445.pdf",
+    "description": "10V 1uF X5R \u00b110% 0402 Multilayer Ceramic Capacitors MLCC - SMD/SMT ROHS",
+    "stock": 9627142,
+    "price": 0.0013,
+    "min_order_qty": 1,
+    "min_assembly_qty": 20,
+    "product_url": "https://jlcpcb.com/partdetail/C14445"
+   }
+  },
+  {
+   "digest": "e3d7172729ecf117647ddde8fb5211b2c0b1f2351b9f4427726be49c8cf1cc93",
+   "chain": "main",
+   "lock_scope": "",
+   "query": "capacitor(capacitance=4.7 microfarad, case=OneOf(0402, 0603, 0805), rated_voltage_dc=>=10 volt, temperature_coefficient_code=X5R, rank=(min(case)))",
+   "filters": {
+    "capacitance": [
+     "Exactly",
+     [
+      "q",
+      "4.7 microfarad"
+     ]
+    ],
+    "case": [
+     "OneOf",
+     [
+      "0402",
+      "0603",
+      "0805"
+     ]
+    ],
+    "rated_voltage_dc": [
+     "Range",
+     [
+      "q",
+      "10 volt"
+     ],
+     null
+    ],
+    "temperature_coefficient_code": [
+     "Exactly",
+     "X5R"
+    ]
+   },
+   "provider": "jlcpcb",
+   "identity": {
+    "mpn": "CL05A475MP5NRNC",
+    "manufacturer": "Samsung Electro-Mechanics",
+    "category": "capacitor",
+    "provider": "jlcpcb",
+    "attributes": {
+     "capacitance": [
+      "q",
+      "4.7 microfarad"
+     ],
+     "case": "0402",
+     "lcsc": "C23733",
+     "library": "basic",
+     "rated_voltage_dc": [
+      "q",
+      "10.0 volt"
+     ],
+     "temperature_coefficient_code": "X5R",
+     "tolerance": 0.2
+    },
+    "provider_ref": "C23733"
+   },
+   "payload": {
+    "v": 1,
+    "datasheet": "https://www.lcsc.com/datasheet/lcsc_datasheet_2304140030_Samsung-Electro-Mechanics-CL05A475MP5NRNC_C23733.pdf",
+    "description": "10V 4.7uF X5R \u00b120% 0402 Multilayer Ceramic Capacitors MLCC - SMD/SMT ROHS",
+    "stock": 629562,
+    "price": 0.0061,
+    "min_order_qty": 1038,
+    "min_assembly_qty": 20,
+    "product_url": "https://jlcpcb.com/partdetail/C23733"
+   }
+  },
+  {
+   "digest": "0351dfc259715e76e1df5d493857ab0468565d7b26879f39000811951b715d55",
+   "chain": "main",
+   "lock_scope": "",
+   "query": "capacitor(capacitance=100 nanofarad, case=OneOf(0402, 0603, 0805), rated_voltage_dc=>=10 volt, temperature_coefficient_code=X7R, rank=(min(case)))",
+   "filters": {
+    "capacitance": [
+     "Exactly",
+     [
+      "q",
+      "100 nanofarad"
+     ]
+    ],
+    "case": [
+     "OneOf",
+     [
+      "0402",
+      "0603",
+      "0805"
+     ]
+    ],
+    "rated_voltage_dc": [
+     "Range",
+     [
+      "q",
+      "10 volt"
+     ],
+     null
+    ],
+    "temperature_coefficient_code": [
+     "Exactly",
+     "X7R"
+    ]
+   },
+   "provider": "jlcpcb",
+   "identity": {
+    "mpn": "CL05B104KO5NNNC",
+    "manufacturer": "Samsung Electro-Mechanics",
+    "category": "capacitor",
+    "provider": "jlcpcb",
+    "attributes": {
+     "capacitance": [
+      "q",
+      "100.0 nanofarad"
+     ],
+     "case": "0402",
+     "lcsc": "C1525",
+     "library": "basic",
+     "rated_voltage_dc": [
+      "q",
+      "16.0 volt"
+     ],
+     "temperature_coefficient_code": "X7R",
+     "tolerance": 0.1
+    },
+    "provider_ref": "C1525"
+   },
+   "payload": {
+    "v": 1,
+    "datasheet": "https://www.lcsc.com/datasheet/lcsc_datasheet_2304140030_Samsung-Electro-Mechanics-CL05B104KO5NNNC_C1525.pdf",
+    "description": "100nF 16V X7R \u00b110% 0402 Multilayer Ceramic Capacitors MLCC - SMD/SMT ROHS",
+    "stock": 37910567,
+    "price": 0.0012,
+    "min_order_qty": 1,
+    "min_assembly_qty": 20,
+    "product_url": "https://jlcpcb.com/partdetail/C1525"
+   }
+  },
+  {
+   "digest": "07c9866ef4eaf5406cdd5840ef31bb229cf368e4497d570e54393caf8635d35e",
+   "chain": "main",
+   "lock_scope": "",
+   "query": "capacitor(capacitance=4.7 microfarad, case=OneOf(0402, 0603, 0805), rated_voltage_dc=>=16 volt, temperature_coefficient_code=X5R, rank=(min(case)))",
+   "filters": {
+    "capacitance": [
+     "Exactly",
+     [
+      "q",
+      "4.7 microfarad"
+     ]
+    ],
+    "case": [
+     "OneOf",
+     [
+      "0402",
+      "0603",
+      "0805"
+     ]
+    ],
+    "rated_voltage_dc": [
+     "Range",
+     [
+      "q",
+      "16 volt"
+     ],
+     null
+    ],
+    "temperature_coefficient_code": [
+     "Exactly",
+     "X5R"
+    ]
+   },
+   "provider": "jlcpcb",
+   "identity": {
+    "mpn": "CL10A475KO8NNNC",
+    "manufacturer": "Samsung Electro-Mechanics",
+    "category": "capacitor",
+    "provider": "jlcpcb",
+    "attributes": {
+     "capacitance": [
+      "q",
+      "4.7 microfarad"
+     ],
+     "case": "0603",
+     "lcsc": "C19666",
+     "library": "basic",
+     "rated_voltage_dc": [
+      "q",
+      "16.0 volt"
+     ],
+     "temperature_coefficient_code": "X5R",
+     "tolerance": 0.1
+    },
+    "provider_ref": "C19666"
+   },
+   "payload": {
+    "v": 1,
+    "datasheet": "https://www.lcsc.com/datasheet/lcsc_datasheet_2304140030_Samsung-Electro-Mechanics-CL10A475KO8NNNC_C19666.pdf",
+    "description": "16V 4.7uF X5R \u00b110% 0603 Multilayer Ceramic Capacitors MLCC - SMD/SMT ROHS",
+    "stock": 3340809,
+    "price": 0.0074,
+    "min_order_qty": 1,
+    "min_assembly_qty": 20,
+    "product_url": "https://jlcpcb.com/partdetail/C19666"
+   }
+  },
+  {
+   "digest": "0898eaa1b3042ec5c54ac33bd63f20871e3fa4f2525bb0ccbb025f2fd0a2de33",
+   "chain": "main",
+   "lock_scope": "",
+   "query": "resistor(case=OneOf(0402, 0603, 0805), resistance=100.0 ohm, tolerance=<=0.05, rank=(min(case)))",
+   "filters": {
+    "case": [
+     "OneOf",
+     [
+      "0402",
+      "0603",
+      "0805"
+     ]
+    ],
+    "resistance": [
+     "Exactly",
+     [
+      "q",
+      "100.0 ohm"
+     ]
+    ],
+    "tolerance": [
+     "Range",
+     null,
+     0.05
+    ]
+   },
+   "provider": "jlcpcb",
+   "identity": {
+    "mpn": "0402WGF1000TCE",
+    "manufacturer": "UNI-ROYAL(Uniroyal Elec)",
+    "category": "resistor",
+    "provider": "jlcpcb",
+    "attributes": {
+     "case": "0402",
+     "composition": "Thick Film Resistor",
+     "lcsc": "C25076",
+     "library": "basic",
+     "max_power": [
+      "q",
+      "62.5 milliwatt"
+     ],
+     "rated_voltage_dc": [
+      "q",
+      "50.0 volt"
+     ],
+     "resistance": [
+      "q",
+      "100.0 ohm"
+     ],
+     "tcr": [
+      "q",
+      "100.0 / megakelvin"
+     ],
+     "tolerance": 0.01
+    },
+    "provider_ref": "C25076"
+   },
+   "payload": {
+    "v": 1,
+    "datasheet": "https://www.lcsc.com/datasheet/lcsc_datasheet_2205311900_UNI-ROYAL-Uniroyal-Elec-0402WGF1000TCE_C25076.pdf",
+    "description": "-55\u2103~+155\u2103 100\u03a9 50V 62.5mW Thick Film Resistor \u00b11% \u00b1100ppm/\u2103 0402 Chip Resistor - Surface Mount ROHS",
+    "stock": 10793097,
+    "price": 0.0007,
+    "min_order_qty": 1,
+    "min_assembly_qty": 20,
+    "product_url": "https://jlcpcb.com/partdetail/C25076"
+   }
+  },
+  {
+   "digest": "f70c110f5f27db59e47f1b6a4b64db0220ff1a51ceee86c15fe6d7286fa41545",
+   "chain": "main",
+   "lock_scope": "",
+   "query": "resistor(case=OneOf(0402, 0603, 0805), resistance=1.0 kiloohm, rank=(min(case)))",
+   "filters": {
+    "case": [
+     "OneOf",
+     [
+      "0402",
+      "0603",
+      "0805"
+     ]
+    ],
+    "resistance": [
+     "Exactly",
+     [
+      "q",
+      "1.0 kiloohm"
+     ]
+    ]
+   },
+   "provider": "jlcpcb",
+   "identity": {
+    "mpn": "0402WGF1001TCE",
+    "manufacturer": "UNI-ROYAL(Uniroyal Elec)",
+    "category": "resistor",
+    "provider": "jlcpcb",
+    "attributes": {
+     "case": "0402",
+     "composition": "Thick Film Resistor",
+     "lcsc": "C11702",
+     "library": "basic",
+     "max_power": [
+      "q",
+      "62.5 milliwatt"
+     ],
+     "rated_voltage_dc": [
+      "q",
+      "50.0 volt"
+     ],
+     "resistance": [
+      "q",
+      "1.0 kiloohm"
+     ],
+     "tcr": [
+      "q",
+      "100.0 / megakelvin"
+     ],
+     "tolerance": 0.01
+    },
+    "provider_ref": "C11702"
+   },
+   "payload": {
+    "v": 1,
+    "datasheet": "https://www.lcsc.com/datasheet/lcsc_datasheet_2206010216_UNI-ROYAL-Uniroyal-Elec-0402WGF1001TCE_C11702.pdf",
+    "description": "-55\u2103~+155\u2103 1k\u03a9 50V 62.5mW Thick Film Resistor \u00b11% \u00b1100ppm/\u2103 0402 Chip Resistor - Surface Mount ROHS",
+    "stock": 31253473,
+    "price": 0.0009,
+    "min_order_qty": 1,
+    "min_assembly_qty": 20,
+    "product_url": "https://jlcpcb.com/partdetail/C11702"
+   }
+  },
+  {
+   "digest": "0ed7afd0c129813f94fc4550d85ac06c45326f799791038854c06ab408a46fe6",
+   "chain": "main",
+   "lock_scope": "",
+   "query": "resistor(case=OneOf(0402, 0603, 0805), resistance=10 kiloohm, tolerance=<=0.01, rank=(min(case)))",
+   "filters": {
+    "case": [
+     "OneOf",
+     [
+      "0402",
+      "0603",
+      "0805"
+     ]
+    ],
+    "resistance": [
+     "Exactly",
+     [
+      "q",
+      "10 kiloohm"
+     ]
+    ],
+    "tolerance": [
+     "Range",
+     null,
+     0.01
+    ]
+   },
+   "provider": "jlcpcb",
+   "identity": {
+    "mpn": "0402WGF1002TCE",
+    "manufacturer": "UNI-ROYAL(Uniroyal Elec)",
+    "category": "resistor",
+    "provider": "jlcpcb",
+    "attributes": {
+     "case": "0402",
+     "composition": "Thick Film Resistor",
+     "lcsc": "C25744",
+     "library": "basic",
+     "max_power": [
+      "q",
+      "62.5 milliwatt"
+     ],
+     "rated_voltage_dc": [
+      "q",
+      "50.0 volt"
+     ],
+     "resistance": [
+      "q",
+      "10.0 kiloohm"
+     ],
+     "tcr": [
+      "q",
+      "100.0 / megakelvin"
+     ],
+     "tolerance": 0.01
+    },
+    "provider_ref": "C25744"
+   },
+   "payload": {
+    "v": 1,
+    "datasheet": "https://www.lcsc.com/datasheet/lcsc_datasheet_2411221126_UNI-ROYAL-Uniroyal-Elec-0402WGF1002TCE_C25744.pdf",
+    "description": "-55\u2103~+155\u2103 10k\u03a9 50V 62.5mW Thick Film Resistor \u00b11% \u00b1100ppm/\u2103 0402 Chip Resistor - Surface Mount ROHS",
+    "stock": 20942529,
+    "price": 0.0008,
+    "min_order_qty": 1,
+    "min_assembly_qty": 20,
+    "product_url": "https://jlcpcb.com/partdetail/C25744"
+   }
+  },
+  {
+   "digest": "0802bbfc39cf1455a0f4d9a3382009fca6020e412f5b4e20612aadf24b0d5b59",
+   "chain": "main",
+   "lock_scope": "",
+   "query": "resistor(case=OneOf(0402, 0603, 0805), resistance=100 kiloohm, tolerance=<=0.01, rank=(min(case)))",
+   "filters": {
+    "case": [
+     "OneOf",
+     [
+      "0402",
+      "0603",
+      "0805"
+     ]
+    ],
+    "resistance": [
+     "Exactly",
+     [
+      "q",
+      "100 kiloohm"
+     ]
+    ],
+    "tolerance": [
+     "Range",
+     null,
+     0.01
+    ]
+   },
+   "adopted_from": "45a7a005326fbe14751b2fe3cfc7c3d1df33417a0b6f7284cb3f7358fb80260f",
+   "provider": "jlcpcb",
+   "identity": {
+    "mpn": "0402WGF1003TCE",
+    "manufacturer": "UNI-ROYAL(Uniroyal Elec)",
+    "category": "resistor",
+    "provider": "jlcpcb",
+    "attributes": {
+     "case": "0402",
+     "composition": "Thick Film Resistor",
+     "lcsc": "C25741",
+     "library": "basic",
+     "max_power": [
+      "q",
+      "62.5 milliwatt"
+     ],
+     "rated_voltage_dc": [
+      "q",
+      "50.0 volt"
+     ],
+     "resistance": [
+      "q",
+      "100.0 kiloohm"
+     ],
+     "tcr": [
+      "q",
+      "100.0 / megakelvin"
+     ],
+     "tolerance": 0.01
+    },
+    "provider_ref": "C25741"
+   },
+   "payload": {
+    "v": 1,
+    "datasheet": "https://www.lcsc.com/datasheet/lcsc_datasheet_2206010100_UNI-ROYAL-Uniroyal-Elec-0402WGF1003TCE_C25741.pdf",
+    "description": "-55\u2103~+155\u2103 100k\u03a9 50V 62.5mW Thick Film Resistor \u00b11% \u00b1100ppm/\u2103 0402 Chip Resistor - Surface Mount ROHS",
+    "stock": 10284510,
+    "price": 0.0005,
+    "min_order_qty": 1,
+    "min_assembly_qty": 20,
+    "product_url": "https://jlcpcb.com/partdetail/C25741"
+   }
+  },
+  {
+   "digest": "03da3933a7ff0a35572be98692682642d4421fca43c4af4ea9b903e007877cc6",
+   "chain": "main",
+   "lock_scope": "",
+   "query": "resistor(case=OneOf(0402, 0603, 0805), resistance=1500000.0 ohm, tolerance=<=0.01, rank=(min(case)))",
+   "filters": {
+    "case": [
+     "OneOf",
+     [
+      "0402",
+      "0603",
+      "0805"
+     ]
+    ],
+    "resistance": [
+     "Exactly",
+     [
+      "q",
+      "1500000.0 ohm"
+     ]
+    ],
+    "tolerance": [
+     "Range",
+     null,
+     0.01
+    ]
+   },
+   "provider": "jlcpcb",
+   "identity": {
+    "mpn": "0402WGF1504TCE",
+    "manufacturer": "UNI-ROYAL(Uniroyal Elec)",
+    "category": "resistor",
+    "provider": "jlcpcb",
+    "attributes": {
+     "case": "0402",
+     "composition": "Thick Film Resistor",
+     "lcsc": "C22276",
+     "library": "extended",
+     "max_power": [
+      "q",
+      "62.5 milliwatt"
+     ],
+     "rated_voltage_dc": [
+      "q",
+      "50.0 volt"
+     ],
+     "resistance": [
+      "q",
+      "1.5 megaohm"
+     ],
+     "tcr": [
+      "q",
+      "100.0 / megakelvin"
+     ],
+     "tolerance": 0.01
+    },
+    "provider_ref": "C22276"
+   },
+   "payload": {
+    "v": 1,
+    "datasheet": "https://www.lcsc.com/datasheet/lcsc_datasheet_2206010130_UNI-ROYAL-Uniroyal-Elec-0402WGF1504TCE_C22276.pdf",
+    "description": "-55\u2103~+155\u2103 1.5M\u03a9 50V 62.5mW Thick Film Resistor \u00b11% \u00b1100ppm/\u2103 0402 Chip Resistor - Surface Mount ROHS",
+    "stock": 661882,
+    "price": 0.0006,
+    "min_order_qty": 1,
+    "min_assembly_qty": 20,
+    "product_url": "https://jlcpcb.com/partdetail/C22276"
+   }
+  },
+  {
+   "digest": "ca5afacfd0b6da983aed4931d617f948aa7c2f5f861c422547b8ed7d07716ae1",
+   "chain": "main",
+   "lock_scope": "",
+   "query": "resistor(case=OneOf(0402, 0603, 0805), resistance=180 kiloohm, tolerance=<=0.01, rank=(min(case)))",
+   "filters": {
+    "case": [
+     "OneOf",
+     [
+      "0402",
+      "0603",
+      "0805"
+     ]
+    ],
+    "resistance": [
+     "Exactly",
+     [
+      "q",
+      "180 kiloohm"
+     ]
+    ],
+    "tolerance": [
+     "Range",
+     null,
+     0.01
+    ]
+   },
+   "provider": "jlcpcb",
+   "identity": {
+    "mpn": "0402WGF1803TCE",
+    "manufacturer": "UNI-ROYAL(Uniroyal Elec)",
+    "category": "resistor",
+    "provider": "jlcpcb",
+    "attributes": {
+     "case": "0402",
+     "composition": "Thick Film Resistor",
+     "lcsc": "C25760",
+     "library": "extended",
+     "max_power": [
+      "q",
+      "62.5 milliwatt"
+     ],
+     "rated_voltage_dc": [
+      "q",
+      "50.0 volt"
+     ],
+     "resistance": [
+      "q",
+      "180.0 kiloohm"
+     ],
+     "tcr": [
+      "q",
+      "100.0 / megakelvin"
+     ],
+     "tolerance": 0.01
+    },
+    "provider_ref": "C25760"
+   },
+   "payload": {
+    "v": 1,
+    "datasheet": "https://www.lcsc.com/datasheet/lcsc_datasheet_2206010100_UNI-ROYAL-Uniroyal-Elec-0402WGF1803TCE_C25760.pdf",
+    "description": "-55\u2103~+155\u2103 180k\u03a9 50V 62.5mW Thick Film Resistor \u00b11% \u00b1100ppm/\u2103 0402 Chip Resistor - Surface Mount ROHS",
+    "stock": 571990,
+    "price": 0.0007,
+    "min_order_qty": 1,
+    "min_assembly_qty": 20,
+    "product_url": "https://jlcpcb.com/partdetail/C25760"
+   }
+  },
+  {
+   "digest": "e4092587a827548234051850aca0279c98934e55179f45c955c118eb870242fe",
+   "chain": "main",
+   "lock_scope": "",
+   "query": "resistor(case=OneOf(0402, 0603, 0805), resistance=2.2 kiloohm, tolerance=<=0.01, rank=(min(case)))",
+   "filters": {
+    "case": [
+     "OneOf",
+     [
+      "0402",
+      "0603",
+      "0805"
+     ]
+    ],
+    "resistance": [
+     "Exactly",
+     [
+      "q",
+      "2.2 kiloohm"
+     ]
+    ],
+    "tolerance": [
+     "Range",
+     null,
+     0.01
+    ]
+   },
+   "provider": "jlcpcb",
+   "identity": {
+    "mpn": "0402WGF2201TCE",
+    "manufacturer": "UNI-ROYAL(Uniroyal Elec)",
+    "category": "resistor",
+    "provider": "jlcpcb",
+    "attributes": {
+     "case": "0402",
+     "composition": "Thick Film Resistor",
+     "lcsc": "C25879",
+     "library": "basic",
+     "max_power": [
+      "q",
+      "62.5 milliwatt"
+     ],
+     "rated_voltage_dc": [
+      "q",
+      "50.0 volt"
+     ],
+     "resistance": [
+      "q",
+      "2.2 kiloohm"
+     ],
+     "tcr": [
+      "q",
+      "100.0 / megakelvin"
+     ],
+     "tolerance": 0.01
+    },
+    "provider_ref": "C25879"
+   },
+   "payload": {
+    "v": 1,
+    "datasheet": "https://www.lcsc.com/datasheet/lcsc_datasheet_2206010045_UNI-ROYAL-Uniroyal-Elec-0402WGF2201TCE_C25879.pdf",
+    "description": "-55\u2103~+155\u2103 2.2k\u03a9 50V 62.5mW Thick Film Resistor \u00b11% \u00b1100ppm/\u2103 0402 Chip Resistor - Surface Mount ROHS",
+    "stock": 3041997,
+    "price": 0.0006,
+    "min_order_qty": 1,
+    "min_assembly_qty": 20,
+    "product_url": "https://jlcpcb.com/partdetail/C25879"
+   }
+  },
+  {
+   "digest": "ed6f5c284dcd752ae29e27791845f5aba56bcd898abec96628e795881f8a4592",
+   "chain": "main",
+   "lock_scope": "",
+   "query": "resistor(case=OneOf(0402, 0603, 0805), resistance=33.0 ohm, rank=(min(case)))",
+   "filters": {
+    "case": [
+     "OneOf",
+     [
+      "0402",
+      "0603",
+      "0805"
+     ]
+    ],
+    "resistance": [
+     "Exactly",
+     [
+      "q",
+      "33.0 ohm"
+     ]
+    ]
+   },
+   "provider": "jlcpcb",
+   "identity": {
+    "mpn": "0402WGF330JTCE",
+    "manufacturer": "UNI-ROYAL(Uniroyal Elec)",
+    "category": "resistor",
+    "provider": "jlcpcb",
+    "attributes": {
+     "case": "0402",
+     "composition": "Thick Film Resistor",
+     "lcsc": "C25105",
+     "library": "basic",
+     "max_power": [
+      "q",
+      "62.5 milliwatt"
+     ],
+     "rated_voltage_dc": [
+      "q",
+      "50.0 volt"
+     ],
+     "resistance": [
+      "q",
+      "33.0 ohm"
+     ],
+     "tcr": [
+      "q",
+      "100.0 / megakelvin"
+     ],
+     "tolerance": 0.01
+    },
+    "provider_ref": "C25105"
+   },
+   "payload": {
+    "v": 1,
+    "datasheet": "https://www.lcsc.com/datasheet/lcsc_datasheet_2205311900_UNI-ROYAL-Uniroyal-Elec-0402WGF330JTCE_C25105.pdf",
+    "description": "-55\u2103~+155\u2103 33\u03a9 50V 62.5mW Thick Film Resistor \u00b11% \u00b1100ppm/\u2103 0402 Chip Resistor - Surface Mount ROHS",
+    "stock": 3386687,
+    "price": 0.0005,
+    "min_order_qty": 1,
+    "min_assembly_qty": 20,
+    "product_url": "https://jlcpcb.com/partdetail/C25105"
+   }
+  },
+  {
+   "digest": "8069a944b94ee0b55d5c80e07cd499cfd8cf8b576200153c96fdc592d87fa08b",
+   "chain": "main",
+   "lock_scope": "",
+   "query": "resistor(case=OneOf(0402, 0603, 0805), resistance=4.7 ohm, tolerance=<=0.01, rank=(min(case)))",
+   "filters": {
+    "case": [
+     "OneOf",
+     [
+      "0402",
+      "0603",
+      "0805"
+     ]
+    ],
+    "resistance": [
+     "Exactly",
+     [
+      "q",
+      "4.7 ohm"
+     ]
+    ],
+    "tolerance": [
+     "Range",
+     null,
+     0.01
+    ]
+   },
+   "provider": "jlcpcb",
+   "identity": {
+    "mpn": "0402WGF470KTCE",
+    "manufacturer": "UNI-ROYAL(Uniroyal Elec)",
+    "category": "resistor",
+    "provider": "jlcpcb",
+    "attributes": {
+     "case": "0402",
+     "composition": "Thick Film Resistor",
+     "lcsc": "C25121",
+     "library": "extended",
+     "max_power": [
+      "q",
+      "62.5 milliwatt"
+     ],
+     "rated_voltage_dc": [
+      "q",
+      "50.0 volt"
+     ],
+     "resistance": [
+      "q",
+      "4.7 ohm"
+     ],
+     "tcr": [
+      "q",
+      "200.0 / megakelvin"
+     ],
+     "tolerance": 0.01
+    },
+    "provider_ref": "C25121"
+   },
+   "payload": {
+    "v": 1,
+    "datasheet": "https://www.lcsc.com/datasheet/lcsc_datasheet_2205311900_UNI-ROYAL-Uniroyal-Elec-0402WGF470KTCE_C25121.pdf",
+    "description": "-55\u2103~+155\u2103 4.7\u03a9 50V 62.5mW Thick Film Resistor \u00b11% \u00b1200ppm/\u2103 0402 Chip Resistor - Surface Mount ROHS",
+    "stock": 319238,
+    "price": 0.0008,
+    "min_order_qty": 1,
+    "min_assembly_qty": 20,
+    "product_url": "https://jlcpcb.com/partdetail/C25121"
+   }
+  },
+  {
+   "digest": "833ea9512467c7bfee9ea70f842cbf7cea666be85dc6f0dcdb252e098f031542",
+   "chain": "main",
+   "lock_scope": "",
+   "query": "resistor(case=OneOf(0402, 0603, 0805), resistance=4.99 kiloohm, tolerance=<=0.01, rank=(min(case)))",
+   "filters": {
+    "case": [
+     "OneOf",
+     [
+      "0402",
+      "0603",
+      "0805"
+     ]
+    ],
+    "resistance": [
+     "Exactly",
+     [
+      "q",
+      "4.99 kiloohm"
+     ]
+    ],
+    "tolerance": [
+     "Range",
+     null,
+     0.01
+    ]
+   },
+   "provider": "jlcpcb",
+   "identity": {
+    "mpn": "0402WGF4991TCE",
+    "manufacturer": "UNI-ROYAL(Uniroyal Elec)",
+    "category": "resistor",
+    "provider": "jlcpcb",
+    "attributes": {
+     "case": "0402",
+     "composition": "Thick Film Resistor",
+     "lcsc": "C25903",
+     "library": "extended",
+     "max_power": [
+      "q",
+      "62.5 milliwatt"
+     ],
+     "rated_voltage_dc": [
+      "q",
+      "50.0 volt"
+     ],
+     "resistance": [
+      "q",
+      "4.99 kiloohm"
+     ],
+     "tcr": [
+      "q",
+      "100.0 / megakelvin"
+     ],
+     "tolerance": 0.01
+    },
+    "provider_ref": "C25903"
+   },
+   "payload": {
+    "v": 1,
+    "datasheet": "https://www.lcsc.com/datasheet/lcsc_datasheet_2206010045_UNI-ROYAL-Uniroyal-Elec-0402WGF4991TCE_C25903.pdf",
+    "description": "-55\u2103~+155\u2103 4.99k\u03a9 50V 62.5mW Thick Film Resistor \u00b11% \u00b1100ppm/\u2103 0402 Chip Resistor - Surface Mount ROHS",
+    "stock": 640511,
+    "price": 0.0008,
+    "min_order_qty": 1,
+    "min_assembly_qty": 20,
+    "product_url": "https://jlcpcb.com/partdetail/C25903"
+   }
+  },
+  {
+   "digest": "795f76f59110ca18739a893f4189c5bb1fbb7e54d3313c487ad206592517ec42",
+   "chain": "main",
+   "lock_scope": "",
+   "query": "resistor(case=OneOf(0402, 0603, 0805), resistance=5.1 kiloohm, tolerance=<=0.01, rank=(min(case)))",
+   "filters": {
+    "case": [
+     "OneOf",
+     [
+      "0402",
+      "0603",
+      "0805"
+     ]
+    ],
+    "resistance": [
+     "Exactly",
+     [
+      "q",
+      "5.1 kiloohm"
+     ]
+    ],
+    "tolerance": [
+     "Range",
+     null,
+     0.01
+    ]
+   },
+   "provider": "jlcpcb",
+   "identity": {
+    "mpn": "0402WGF5101TCE",
+    "manufacturer": "UNI-ROYAL(Uniroyal Elec)",
+    "category": "resistor",
+    "provider": "jlcpcb",
+    "attributes": {
+     "case": "0402",
+     "composition": "Thick Film Resistor",
+     "lcsc": "C25905",
+     "library": "basic",
+     "max_power": [
+      "q",
+      "62.5 milliwatt"
+     ],
+     "rated_voltage_dc": [
+      "q",
+      "50.0 volt"
+     ],
+     "resistance": [
+      "q",
+      "5.1 kiloohm"
+     ],
+     "tcr": [
+      "q",
+      "100.0 / megakelvin"
+     ],
+     "tolerance": 0.01
+    },
+    "provider_ref": "C25905"
+   },
+   "payload": {
+    "v": 1,
+    "datasheet": "https://www.lcsc.com/datasheet/lcsc_datasheet_2206010045_UNI-ROYAL-Uniroyal-Elec-0402WGF5101TCE_C25905.pdf",
+    "description": "-55\u2103~+155\u2103 5.1k\u03a9 50V 62.5mW Thick Film Resistor \u00b11% \u00b1100ppm/\u2103 0402 Chip Resistor - Surface Mount ROHS",
+    "stock": 3823841,
+    "price": 0.0008,
+    "min_order_qty": 1,
+    "min_assembly_qty": 20,
+    "product_url": "https://jlcpcb.com/partdetail/C25905"
+   }
+  },
+  {
+   "digest": "dcbc9d137a10c21f8be66725e45b82cb6819e78b1fbd908fedaf08cab937339c",
+   "chain": "main",
+   "lock_scope": "",
+   "query": "resistor(case=OneOf(0402, 0603, 0805), resistance=10000.0 ohm, rank=(min(case)))",
+   "filters": {
+    "case": [
+     "OneOf",
+     [
+      "0402",
+      "0603",
+      "0805"
+     ]
+    ],
+    "resistance": [
+     "Exactly",
+     [
+      "q",
+      "10000.0 ohm"
+     ]
+    ]
+   },
+   "provider": "jlcpcb",
+   "identity": {
+    "mpn": "0402WGJ0103TCE",
+    "manufacturer": "UNI-ROYAL(Uniroyal Elec)",
+    "category": "resistor",
+    "provider": "jlcpcb",
+    "attributes": {
+     "case": "0402",
+     "composition": "Thick Film Resistor",
+     "lcsc": "C25531",
+     "library": "extended",
+     "max_power": [
+      "q",
+      "62.5 milliwatt"
+     ],
+     "rated_voltage_dc": [
+      "q",
+      "50.0 volt"
+     ],
+     "resistance": [
+      "q",
+      "10.0 kiloohm"
+     ],
+     "tcr": [
+      "q",
+      "100.0 / megakelvin"
+     ],
+     "tolerance": 0.05
+    },
+    "provider_ref": "C25531"
+   },
+   "payload": {
+    "v": 1,
+    "datasheet": "https://www.lcsc.com/datasheet/lcsc_datasheet_2411221126_UNI-ROYAL-Uniroyal-Elec-0402WGJ0103TCE_C25531.pdf",
+    "description": "-55\u2103~+155\u2103 10k\u03a9 50V 62.5mW Thick Film Resistor \u00b1100ppm/\u2103 \u00b15% 0402 Chip Resistor - Surface Mount ROHS",
+    "stock": 229197,
+    "price": 0.0014,
+    "min_order_qty": 1,
+    "min_assembly_qty": 20,
+    "product_url": "https://jlcpcb.com/partdetail/C25531"
+   }
+  },
+  {
+   "digest": "45a7a005326fbe14751b2fe3cfc7c3d1df33417a0b6f7284cb3f7358fb80260f",
+   "chain": "main",
+   "lock_scope": "",
+   "query": "resistor(case=OneOf(0402, 0603, 0805), resistance=100 kiloohm, tolerance=<=0.05, rank=(min(case)))",
+   "filters": {
+    "case": [
+     "OneOf",
+     [
+      "0402",
+      "0603",
+      "0805"
+     ]
+    ],
+    "resistance": [
+     "Exactly",
+     [
+      "q",
+      "100 kiloohm"
+     ]
+    ],
+    "tolerance": [
+     "Range",
+     null,
+     0.05
+    ]
+   },
+   "provider": "jlcpcb",
+   "identity": {
+    "mpn": "0402WGJ0104TCE",
+    "manufacturer": "UNI-ROYAL(Uniroyal Elec)",
+    "category": "resistor",
+    "provider": "jlcpcb",
+    "attributes": {
+     "case": "0402",
+     "composition": "Thick Film Resistor",
+     "lcsc": "C25530",
+     "library": "extended",
+     "max_power": [
+      "q",
+      "62.5 milliwatt"
+     ],
+     "rated_voltage_dc": [
+      "q",
+      "50.0 volt"
+     ],
+     "resistance": [
+      "q",
+      "100.0 kiloohm"
+     ],
+     "tcr": [
+      "q",
+      "100.0 / megakelvin"
+     ],
+     "tolerance": 0.05
+    },
+    "provider_ref": "C25530"
+   },
+   "payload": {
+    "v": 1,
+    "datasheet": "https://www.lcsc.com/datasheet/lcsc_datasheet_2205311845_UNI-ROYAL-Uniroyal-Elec-0402WGJ0104TCE_C25530.pdf",
+    "description": "-55\u2103~+155\u2103 100k\u03a9 50V 62.5mW Thick Film Resistor \u00b1100ppm/\u2103 \u00b15% 0402 Chip Resistor - Surface Mount ROHS",
+    "stock": 9879889,
+    "price": 0.0005,
+    "min_order_qty": 1,
+    "min_assembly_qty": 20,
+    "product_url": "https://jlcpcb.com/partdetail/C25530"
+   }
+  },
+  {
+   "digest": "9b41304a62f0b1bb1b2ce963958ecb2460f7d007b49c0a72c767df9ae82c9b25",
+   "chain": "main",
+   "lock_scope": "",
+   "query": "resistor(case=OneOf(0402, 0603, 0805), resistance=100 kiloohm, rank=(min(case)))",
+   "filters": {
+    "case": [
+     "OneOf",
+     [
+      "0402",
+      "0603",
+      "0805"
+     ]
+    ],
+    "resistance": [
+     "Exactly",
+     [
+      "q",
+      "100 kiloohm"
+     ]
+    ]
+   },
+   "provider": "jlcpcb",
+   "identity": {
+    "mpn": "0402WGJ0104TCE",
+    "manufacturer": "UNI-ROYAL(Uniroyal Elec)",
+    "category": "resistor",
+    "provider": "jlcpcb",
+    "attributes": {
+     "case": "0402",
+     "composition": "Thick Film Resistor",
+     "lcsc": "C25530",
+     "library": "extended",
+     "max_power": [
+      "q",
+      "62.5 milliwatt"
+     ],
+     "rated_voltage_dc": [
+      "q",
+      "50.0 volt"
+     ],
+     "resistance": [
+      "q",
+      "100.0 kiloohm"
+     ],
+     "tcr": [
+      "q",
+      "100.0 / megakelvin"
+     ],
+     "tolerance": 0.05
+    },
+    "provider_ref": "C25530"
+   },
+   "payload": {
+    "v": 1,
+    "datasheet": "https://www.lcsc.com/datasheet/lcsc_datasheet_2205311845_UNI-ROYAL-Uniroyal-Elec-0402WGJ0104TCE_C25530.pdf",
+    "description": "-55\u2103~+155\u2103 100k\u03a9 50V 62.5mW Thick Film Resistor \u00b1100ppm/\u2103 \u00b15% 0402 Chip Resistor - Surface Mount ROHS",
+    "stock": 9879999,
+    "price": 0.0005,
+    "min_order_qty": 1,
+    "min_assembly_qty": 20,
+    "product_url": "https://jlcpcb.com/partdetail/C25530"
+   }
+  },
+  {
+   "digest": "e333bd9bc61b8ddd3ced83c17c15a15991cb78a4b8e869dfe8992ec689bc3b51",
+   "chain": "main",
+   "lock_scope": "",
+   "query": "resistor(case=OneOf(0402, 0603, 0805), library=basic, max_power=>=0.125 watt, resistance=47.0 ohm, tolerance=<=0.05, rank=(min(case)))",
+   "filters": {
+    "case": [
+     "OneOf",
+     [
+      "0402",
+      "0603",
+      "0805"
+     ]
+    ],
+    "library": [
+     "Exactly",
+     "basic"
+    ],
+    "max_power": [
+     "Range",
+     [
+      "q",
+      "0.125 watt"
+     ],
+     null
+    ],
+    "resistance": [
+     "Exactly",
+     [
+      "q",
+      "47.0 ohm"
+     ]
+    ],
+    "tolerance": [
+     "Range",
+     null,
+     0.05
+    ]
+   },
+   "provider": "jlcpcb",
+   "identity": {
+    "mpn": "0805W8F470JT5E",
+    "manufacturer": "UNI-ROYAL(Uniroyal Elec)",
+    "category": "resistor",
+    "provider": "jlcpcb",
+    "attributes": {
+     "case": "0805",
+     "composition": "Thick Film Resistor",
+     "lcsc": "C17714",
+     "library": "basic",
+     "max_power": [
+      "q",
+      "125.0 milliwatt"
+     ],
+     "rated_voltage_dc": [
+      "q",
+      "150.0 volt"
+     ],
+     "resistance": [
+      "q",
+      "47.0 ohm"
+     ],
+     "tcr": [
+      "q",
+      "100.0 / megakelvin"
+     ],
+     "tolerance": 0.01
+    },
+    "provider_ref": "C17714"
+   },
+   "payload": {
+    "v": 1,
+    "datasheet": "https://www.lcsc.com/datasheet/lcsc_datasheet_2206010200_UNI-ROYAL-Uniroyal-Elec-0805W8F470JT5E_C17714.pdf",
+    "description": "-55\u2103~+155\u2103 125mW 150V 47\u03a9 Thick Film Resistor \u00b11% \u00b1100ppm/\u2103 0805 Chip Resistor - Surface Mount ROHS",
+    "stock": 851642,
+    "price": 0.0013,
+    "min_order_qty": 1,
+    "min_assembly_qty": 20,
+    "product_url": "https://jlcpcb.com/partdetail/C17714"
+   }
+  }
+ ]
+}

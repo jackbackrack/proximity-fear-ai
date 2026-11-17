@@ -1,0 +1,33 @@
+{
+  "entries": [
+    {"tag":"instantiation","def-id":"DtLb2zLYJdeCQUbVaXAp2","inst-id":"5x2Jkvd8Xx3LqycMhCfeB9"},
+    {"tag":"instantiation","def-id":"DtLb2zLYJdeCQUbVaXAp2","inst-id":"D61n8no9G5uR5Y7roBvGb5"},
+    {"tag":"instantiation","def-id":0,"inst-id":"EX2kw1G1zaty7RdoMNpHDn"},
+    {"tag":"instantiation","def-id":1,"inst-id":"DjNPmfmp5YYydEZTZPfACD"},
+    {"tag":"instantiation","def-id":"GLpJ1kPWDjs1NiDdujPXzA","inst-id":"23kx9PXUgFy3rv9GwnuHqn"},
+    {"tag":"package-contains-pad","pkg-id":"EfN2PjMzrA6KyT9Z7jMvCr","pad-id":"5x2Jkvd8Xx3LqycMhCfeB9"},
+    {"tag":"package-contains-pad","pkg-id":"EfN2PjMzrA6KyT9Z7jMvCr","pad-id":"D61n8no9G5uR5Y7roBvGb5"},
+    {"tag":"def-pin-uses-pad","pin-id":1,"pad-id":"5x2Jkvd8Xx3LqycMhCfeB9","index":0},
+    {"tag":"component-has-pin","def-id":"GLpJ1kPWDjs1NiDdujPXzA","pin-id":1},
+    {"tag":"def-pin-uses-pad","pin-id":0,"pad-id":"D61n8no9G5uR5Y7roBvGb5","index":0},
+    {"tag":"component-has-pin","def-id":"GLpJ1kPWDjs1NiDdujPXzA","pin-id":0},
+    {"tag":"component-uses-package","component-id":"GLpJ1kPWDjs1NiDdujPXzA","package-id":"EfN2PjMzrA6KyT9Z7jMvCr"},
+    {"tag":"inst-contains","parent-id":"23kx9PXUgFy3rv9GwnuHqn","child-id":"EX2kw1G1zaty7RdoMNpHDn"},
+    {"tag":"inst-contains","parent-id":"23kx9PXUgFy3rv9GwnuHqn","child-id":"DjNPmfmp5YYydEZTZPfACD"},
+    {"tag":"inst-contains","parent-id":"8Q4hyqe4Ye97n335YkBHsX","child-id":"23kx9PXUgFy3rv9GwnuHqn"},
+    {"tag":"package-pad","id":"5x2Jkvd8Xx3LqycMhCfeB9","ref":{"ref":{"name":"p"},"index":2},"pose":{"center":{"x":"BgJchf3oPk1","y":"11111111"},"angle":"11111111","flip-x?":false},"side":"Top"},
+    {"tag":"package-pad","id":"D61n8no9G5uR5Y7roBvGb5","ref":{"ref":{"name":"p"},"index":1},"pose":{"center":{"x":"Z64iUyrwDzD","y":"11111111"},"angle":"11111111","flip-x?":false},"side":"Top"},
+    {"tag":"via-def","id":2,"name":"THVia"},
+    {"tag":"via-def","id":3,"name":"MicroVia"},
+    {"tag":"pad-def","id":"DtLb2zLYJdeCQUbVaXAp2","name":"SMDPad","shape":{"type":"polygon","points":[{"x":"BfpUx7i2Tn9","y":"BgJchf3oPk1"},{"x":"Z5aajSXAJ2M","y":"BgJchf3oPk1"},{"x":"Z5aajSXAJ2M","y":"Z64iUyrwDzD"},{"x":"BfpUx7i2Tn9","y":"Z64iUyrwDzD"}]},"type":"SMD"},
+    {"tag":"package","id":"EfN2PjMzrA6KyT9Z7jMvCr","name":"SOD882Landpattern","package-hash":-541071575},
+    {"tag":"def-pin","id":0},
+    {"tag":"def-pin","id":1},
+    {"tag":"component","id":"GLpJ1kPWDjs1NiDdujPXzA","name":"PESD5V0S1BL","reference-prefix":"D"},
+    {"tag":"symbol","id":4},
+    {"tag":"pin","id":"EX2kw1G1zaty7RdoMNpHDn","ref":{"ref":{"name":"dut"},"field":{"name":"p1"}}},
+    {"tag":"pin","id":"DjNPmfmp5YYydEZTZPfACD","ref":{"ref":{"name":"dut"},"field":{"name":"p2"}}},
+    {"tag":"component-inst","id":"23kx9PXUgFy3rv9GwnuHqn","public?":true,"ref":{"name":"dut"},"schematic-groups":[],"explicit-designator":null},
+    {"tag":"top-module-inst","id":"8Q4hyqe4Ye97n335YkBHsX","def-name":"circuit"}
+  ]
+}

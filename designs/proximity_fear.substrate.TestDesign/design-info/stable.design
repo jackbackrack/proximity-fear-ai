@@ -1,0 +1,8 @@
+{
+  "entries": [
+    {"tag":"via-def","id":0,"name":"Tented/Filled Standard Via"},
+    {"tag":"via-def","id":1,"name":"Standard Via - No Extra Cost"},
+    {"tag":"via-def","id":2,"name":"Standard Via Aggressive - No Extra Cost"},
+    {"tag":"top-module-inst","id":"23n3NVLFWk9v21CpjGTCLJ","def-name":"Circuit"}
+  ]
+}

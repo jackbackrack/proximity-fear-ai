@@ -1,0 +1,72 @@
+{
+  "version": 3,
+  "assignments": [
+  ],
+  "id-mapping": {
+    "boxes": [
+      [{"id":"111111111gYFZscieF","unit-id":0},2],
+      [{"id":"111111111gYFUn2bPN","unit-id":0},8],
+      [{"id":"FsJfVe7db3naE7UaPe6cZ3","unit-id":0},14],
+      [{"id":"4J58jv14VNNivYBygkJq86","unit-id":0},17]
+    ],
+    "inst-boxes": [
+      [{"id":"GWE4mfBYfwVJGWWnQYDPME","unit-id":0},18],
+      [{"id":"7meME4USbeENAzGqjAfZiA","unit-id":0},19]
+    ],
+    "annotation-boxes": [
+    ],
+    "nets": [
+    ],
+    "ports": [
+      ["111111111gYHQ8J5iJ",0],
+      ["111111111gYHVswzx3",1],
+      ["111111111gYGoiFbhT",3],
+      ["111111111gYGxLFkrc",4],
+      ["111111111gYH3FZ2px",5],
+      ["111111111gYH9LmaAk",6],
+      ["111111111gYHFXA8on",7],
+      ["111111111gYFgKCYMV",9],
+      ["111111111gYGG8jkfd",10],
+      ["111111111gYFobozjd",11],
+      ["111111111gYG2fhn1J",12],
+      ["111111111gYFuEwvJw",13],
+      ["111111111gYGM9VczS",15],
+      ["111111111gYGAd1C4n",16]
+    ]
+  },
+  "design": {
+    "input": {
+      "paper-size": {
+        "x": 200,
+        "y": 125
+      },
+      "label-style": {
+        "type": "monospace-label-style",
+        "height-in-grid-units": 0.8,
+        "char-width-relative-to-height": 0.6
+      },
+      "boxes": [
+        {"id":2,"sw":{"x":-2,"y":-3},"ne":{"x":6,"y":3},"ports":[{"id":0,"pt":{"x":0,"y":3},"dir":"Up","tag":"AnyTag"},{"id":1,"pt":{"x":0,"y":-3},"dir":"Down","tag":"AnyTag"}],"orientation":{"type":"any-rotation"}},
+        {"id":8,"sw":{"x":-5,"y":-8},"ne":{"x":5,"y":8},"ports":[{"id":3,"pt":{"x":0,"y":8},"dir":"Up","tag":"AnyTag"},{"id":4,"pt":{"x":5,"y":1},"dir":"Right","tag":"AnyTag"},{"id":5,"pt":{"x":0,"y":-8},"dir":"Down","tag":"AnyTag"},{"id":6,"pt":{"x":-5,"y":1},"dir":"Left","tag":"AnyTag"},{"id":7,"pt":{"x":-5,"y":-1},"dir":"Left","tag":"AnyTag"}],"orientation":{"type":"prefer-rotation","rotations":[0]}},
+        {"id":14,"sw":{"x":-5,"y":-8},"ne":{"x":5,"y":8},"ports":[{"id":9,"pt":{"x":0,"y":8},"dir":"Up","tag":"AnyTag"},{"id":10,"pt":{"x":5,"y":1},"dir":"Right","tag":"AnyTag"},{"id":11,"pt":{"x":0,"y":-8},"dir":"Down","tag":"AnyTag"},{"id":12,"pt":{"x":-5,"y":1},"dir":"Left","tag":"AnyTag"},{"id":13,"pt":{"x":-5,"y":-1},"dir":"Left","tag":"AnyTag"}],"orientation":{"type":"prefer-rotation","rotations":[0]}},
+        {"id":17,"sw":{"x":-2,"y":-3},"ne":{"x":6,"y":3},"ports":[{"id":15,"pt":{"x":0,"y":3},"dir":"Up","tag":"AnyTag"},{"id":16,"pt":{"x":0,"y":-3},"dir":"Down","tag":"AnyTag"}],"orientation":{"type":"any-rotation"}}
+      ],
+      "insts": [
+        {"id":18,"box":14,"group":null},
+        {"id":19,"box":17,"group":null}
+      ],
+      "nets": [
+        {"id":29,"name":{"type":"ref","value":["3V3"]},"refs":[{"inst":18,"port":9},{"inst":19,"port":15}],"labeled?":{"type":"string"}},
+        {"id":30,"name":{"type":"ref","value":["GND"]},"refs":[{"inst":18,"port":11},{"inst":18,"port":13},{"inst":19,"port":16}],"labeled?":{"type":"string"}}
+      ],
+      "shorts": [
+      ],
+      "schematic-group-order": [
+      ]
+    },
+    "sheets": [
+      {"id":47,"title":null,"groups":[{"id":31,"groups":[null],"border":{"sw":{"x":87,"y":50},"ne":{"x":113,"y":74}},"insts":[{"inst":18,"pose":{"center":{"x":96,"y":62},"angle":0,"flip-x?":false}},{"inst":19,"pose":{"center":{"x":105,"y":57},"angle":0,"flip-x?":false}}],"children":[]}],"nets":[{"id":46,"net":30,"refs":[{"inst":18,"port":11}],"wires":[],"label?":{"type":"string","id":44,"pose":{"center":{"x":96,"y":54},"angle":270,"flip-x?":false}}},{"id":43,"net":30,"refs":[{"inst":18,"port":13}],"wires":[],"label?":{"type":"string","id":42,"pose":{"center":{"x":91,"y":61},"angle":180,"flip-x?":false}}},{"id":41,"net":29,"refs":[{"inst":18,"port":9}],"wires":[],"label?":{"type":"string","id":40,"pose":{"center":{"x":96,"y":70},"angle":90,"flip-x?":false}}},{"id":39,"net":30,"refs":[{"inst":19,"port":16}],"wires":[],"label?":{"type":"string","id":34,"pose":{"center":{"x":105,"y":54},"angle":270,"flip-x?":false}}},{"id":33,"net":29,"refs":[{"inst":19,"port":15}],"wires":[],"label?":{"type":"string","id":32,"pose":{"center":{"x":105,"y":60},"angle":90,"flip-x?":false}}}]}
+    ],
+    "hierarchical-diagram": null
+  }
+}
