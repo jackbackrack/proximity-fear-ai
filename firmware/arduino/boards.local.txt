@@ -1,0 +1,45 @@
+# Proximity Fear Badge: generated from the core's pca10056 entry by install_variant.sh
+proximityfear.name=Proximity Fear Badge
+proximityfear.vid.0=0x239A
+proximityfear.pid.0=0x80DA
+proximityfear.vid.1=0x239A
+proximityfear.pid.1=0x00DA
+proximityfear.bootloader.tool=bootburn
+proximityfear.upload.tool=nrfutil
+proximityfear.upload.protocol=nrfutil
+proximityfear.upload.use_1200bps_touch=true
+proximityfear.upload.wait_for_upload_port=true
+proximityfear.upload.maximum_size=815104
+proximityfear.upload.maximum_data_size=237568
+proximityfear.build.mcu=cortex-m4
+proximityfear.build.f_cpu=64000000
+proximityfear.build.board=PROXIMITY_FEAR_BADGE
+proximityfear.build.core=nRF5
+proximityfear.build.variant=proximity_fear_badge
+proximityfear.build.usb_manufacturer="Proximity Fear"
+proximityfear.build.usb_product="Proximity Fear Badge"
+proximityfear.build.extra_flags=-DNRF52840_XXAA {build.flags.usb}
+proximityfear.build.ldscript=nrf52840_s140_v6.ld
+proximityfear.build.openocdscript=scripts/openocd/daplink_nrf52.cfg
+proximityfear.build.vid=0x239A
+proximityfear.build.pid=0x80DA
+proximityfear.build.uf2_family=0xADA52840
+proximityfear.menu.softdevice.s140v6=S140 6.1.1
+proximityfear.menu.softdevice.s140v6.build.sd_name=s140
+proximityfear.menu.softdevice.s140v6.build.sd_version=6.1.1
+proximityfear.menu.softdevice.s140v6.build.sd_fwid=0x00B6
+proximityfear.menu.debug.l0=Level 0 (Release)
+proximityfear.menu.debug.l0.build.debug_flags=-DCFG_DEBUG=0
+proximityfear.menu.debug.l1=Level 1 (Error Message)
+proximityfear.menu.debug.l1.build.debug_flags=-DCFG_DEBUG=1
+proximityfear.menu.debug.l2=Level 2 (Full Debug)
+proximityfear.menu.debug.l2.build.debug_flags=-DCFG_DEBUG=2
+proximityfear.menu.debug.l3=Level 3 (Segger SystemView)
+proximityfear.menu.debug.l3.build.debug_flags=-DCFG_DEBUG=3
+proximityfear.menu.debug.l3.build.sysview_flags=-DCFG_SYSVIEW=1
+proximityfear.menu.debug_output.serial=Serial
+proximityfear.menu.debug_output.serial.build.logger_flags=-DCFG_LOGGER=0
+proximityfear.menu.debug_output.serial1=Serial1
+proximityfear.menu.debug_output.serial1.build.logger_flags=-DCFG_LOGGER=1 -DCFG_TUSB_DEBUG=CFG_DEBUG
+proximityfear.menu.debug_output.rtt=Segger RTT
+proximityfear.menu.debug_output.rtt.build.logger_flags=-DCFG_LOGGER=2 -DCFG_TUSB_DEBUG=CFG_DEBUG -DSEGGER_RTT_MODE_DEFAULT=SEGGER_RTT_MODE_BLOCK_IF_FIFO_FULL

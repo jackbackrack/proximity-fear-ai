@@ -23,3 +23,9 @@ parts-db/
 # Warp autosaved design-report snapshots
 /autosave/
 *.egg-info/
+
+# firmware: upstream clones, build output, tool venv
+/firmware/Adafruit_nRF52_Bootloader/
+/firmware/.venv/
+/firmware/*/build/
+/firmware/tools/
