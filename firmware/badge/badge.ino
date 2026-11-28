@@ -14,6 +14,10 @@
 //   current loudness (log scale over a tracked background floor) and fades slowly,
 //   leaving a trail. Louder reaches further out (inner -> middle -> outer, ramped
 //   smoothly) and shifts colour blue -> green -> red. Uses each LED's true angle.
+//   Perceptual (after scottlawsonbc/audio-reactive-led-strip): loudness is the mean
+//   log energy of 20 mel bands, colour is the balance of bass (red) / mids (green) /
+//   treble (blue), each auto-ranged and squared; LEDs get gamma 2.2 with temporal
+//   dithering so fades look even down to black.
 //   Automatic gain (default): the display spans a tracked floor (the quiet gaps) to a
 //   tracked ceiling (recent loud level, ~15 s memory), so any room uses the full
 //   range. Long-press the button (0.8 s) to toggle auto / fixed (white sweep = auto,
@@ -21,20 +25,25 @@
 //
 // BEAT: music beat detection (beat.h): mel-band spectral flux with an adaptive
 //   threshold finds onsets; a tempo tracker locks onto the beat period and predicts
-//   each beat, carrying the pulse through short gaps. Each beat sends a warm-white
-//   ripple outward through the rings over an ambient glow of the music's bands
-//   (outer ring = bass in red, middle = mids in green, inner = treble in blue).
+//   each beat, carrying the pulse through short gaps. Colour follows timbre (the
+//   spectral centroid, auto-ranged over the last ~15 s) on the spectrum in wavelength
+//   order, low sounds red through orange, yellow, green, cyan, blue to violet for the
+//   brightest: each beat's ripple takes the colour of that hit (kick red, snare green,
+//   hats blue-violet), radiating inner -> outer, pale at the crest; under it a "mood" glow
+//   (3 s timbre average) lit by each ring's band (outer bass, middle mids, inner
+//   treble). Gamma 2.2 + dithering as in the radar.
 //
 // SYNC (fw-05): the fear heart, plus badge-to-badge beat sync over BLE. Each badge
 //   broadcasts its beat phase and bpm in a non-connectable advertisement and listens
 //   for the others (no pairing). Peers in range (weighted by RSSI) pull each other's
-//   phase together (Kuramoto-style coupling) and share one heart rate (the weighted
-//   average of everyone's distance-driven rate), so nearby hearts beat as one. The
-//   rings take a violet tint that deepens with the number and closeness of peers.
+//   phase together (Kuramoto-style coupling). Every badge beats at a fixed SYNC_BPM
+//   (60) here - distance doesn't change the rate - so only the phase has to lock.
+//   Colour: magenta alone; hearing another badge, orange when the beats are a quarter
+//   beat or more apart, blending to blue-violet as they lock into step.
 //
 // The sensor a mode doesn't use is idled (ToF ranging stopped with XSHUT high /
-// PDM stopped). USB serial prints status twice a second; in SOUND mode '+' / '-'
-// change sensitivity.
+// PDM stopped). USB serial prints status twice a second; '+' / '-' change sound
+// sensitivity; 'F' / 'S' / 'B' / 'Y' select FEAR / SOUND / BEAT / SYNC.
 //
 // Firmware rules (proximity_fear/main.py): the variant leaves the IR receiver off;
 // ToF "off" is stopped ranging with XSHUT high, never XSHUT low; CHG_EN is released
@@ -73,7 +82,7 @@ static const float RING_GAIN[3] = {1.0f, 0.85f, 0.7f};
 static const float LUB = 1.0f, DUB = 0.6f;
 
 // ---- SOUND tuning ----------------------------------------------------------------
-static const uint8_t SOUND_PEAK = 40;       // of 255: <= ~95 mA with every LED lit
+static const uint8_t SOUND_PEAK = 56;       // of 255 at full lightness (after gamma 2.2)
 
 // ---- State -----------------------------------------------------------------------
 static bool tofOk = false;
@@ -117,9 +126,10 @@ static bool chargeInhibited = false;
 static const uint16_t SYNC_COMPANY_ID = 0xFFFF;  // Bluetooth SIG "test / no company"
 static const uint8_t SYNC_MAGIC[2] = {'P', 'F'};
 static const uint8_t SYNC_VERSION = 1;
+static const float SYNC_BPM = 60.0f;        // SYNC beats at this fixed rate (no distance)
 static const uint32_t SYNC_TX_MS = 60;      // re-stamp and re-advertise this often
 static const uint32_t PEER_TIMEOUT_MS = 1500;
-static const int8_t RSSI_FAR = -95;         // weight 0 at or below this
+static const int8_t RSSI_FAR = -105;        // weight 0 at or below this (no antennas yet)
 static const int8_t RSSI_NEAR = -65;        // weight 1 at or above this
 static const float PHASE_COUPLING = 2.0f;   // 1/s per unit weight
 static const uint8_t MAX_PEERS = 8;
@@ -136,9 +146,14 @@ static Peer peers[MAX_PEERS];
 static uint16_t myId = 0;
 static float ownBpm = REST_BPM;   // this badge's distance-driven rate
 static float coupling = 0.0f;     // sum of peer weights (0 = alone)
+static float phaseErr = 0.0f;     // smoothed |phase difference| to peers, 0 .. 0.5 beat
 static int peersNear = 0;
 static bool bleRunning = false;
 static bool advOk = false;
+static volatile uint32_t rxAny = 0;    // every advertising report the scanner delivers
+static bool scanOk = false;
+static volatile uint32_t rxCount = 0;  // SYNC packets heard from any peer
+static volatile int8_t rxRssi = 0;      // signal strength of the latest one
 
 // ---- Power / charging ------------------------------------------------------------
 
@@ -264,7 +279,7 @@ static void processAudio() {
   ceilLog += (1.0f - expf(-dt / tauC)) * (levelLog - ceilLog);
   if (ceilLog < floorLog + MIN_SPAN_LOG) ceilLog = floorLog + MIN_SPAN_LOG;
   floorRms = expf(floorLog);
-  if (mode == MODE_BEAT) beatFeed(pdmBuffer, n);
+  if (mode == MODE_BEAT || mode == MODE_SOUND) beatFeed(pdmBuffer, n);
 }
 
 // Loudness 0..1 for the display: auto gain spans floor..ceiling; fixed spans
@@ -301,14 +316,14 @@ static void fearUpdate(float dt, uint32_t now, bool sync) {
 
   float d = distM < 0.05f ? 0.05f : distM;
   float b = (distM >= FAR_M - 0.01f) ? REST_BPM : REST_BPM + FEAR_K / d;
-  ownBpm = b > MAX_BPM ? MAX_BPM : b;
+  ownBpm = sync ? SYNC_BPM : (b > MAX_BPM ? MAX_BPM : b);  // SYNC: one fixed rate
   bpm = ownBpm;
 
   float phasePull = 0.0f;
   coupling = 0.0f;
   peersNear = 0;
   if (sync) {
-    float wSum = 1.0f, bpmSum = ownBpm;
+    float wSum = 1.0f, bpmSum = ownBpm, errSum = 0.0f;
     for (int i = 0; i < MAX_PEERS; i++) {
       float w = peerWeight(peers[i], now);
       if (w <= 0) continue;
@@ -318,9 +333,14 @@ static void fearUpdate(float dt, uint32_t now, bool sync) {
       wSum += w;
       // Where that peer is now: its stamped phase advanced at its own beating rate.
       float peerNow = peers[i].phase + (now - peers[i].rxMs) / 1000.0f * peers[i].effBpm / 60.0f;
-      phasePull += w * wrapHalf(peerNow - phase);
+      float d = wrapHalf(peerNow - phase);
+      phasePull += w * d;
+      errSum += w * fabsf(d);
     }
     bpm = bpmSum / wSum;  // shared heart: weighted average of everyone's own rate
+    // Phase error for the display, smoothed over ~0.5 s.
+    float err = coupling > 0 ? errSum / coupling : 0.0f;
+    phaseErr += (1.0f - expf(-dt / 0.5f)) * (err - phaseErr);
   }
 
   float period = 60.0f / bpm;
@@ -367,15 +387,33 @@ static void fearRender(uint32_t now) {
   float peak = FEAR_PEAK * (0.45f + 0.55f * fear);
   for (int r = 0; r < 3; r++) {
     float v = level[r] > 1.0f ? 1.0f : level[r];
-    float red = v * peak;
-    if (red < 1.0f) red = 1.0f;             // faint ember between beats
-    float green = v * peak * 0.18f * fear;  // hotter when afraid
-    // SYNC: always magenta (so the mode is visible), deepening to violet with peers.
-    float tint = (mode == MODE_SYNC) ? fmaxf(0.35f, fminf(1.0f, 0.35f + 0.65f * coupling)) : 0.0f;
-    float blue = v * peak * 0.6f * tint;
-    if (tint > 0 && blue < 1.0f) blue = 1.0f;
-    green *= (1.0f - tint);
-    uint32_t c = ring.Color((uint8_t)red, (uint8_t)green, (uint8_t)blue);
+    float rgb[3];
+    if (mode == MODE_SYNC) {
+      // Alone: magenta. Hearing another badge: the colour shows how far apart the beats
+      // are - orange when a quarter beat or more apart, through to blue-violet in step.
+      static const float ALONE[3] = {1.0f, 0.0f, 0.35f};
+      static const float APART[3] = {1.0f, 0.45f, 0.0f};
+      static const float LOCKED[3] = {0.35f, 0.25f, 1.0f};
+      float m = phaseErr / 0.25f;                     // 0 in step .. 1 a quarter beat or more
+      m = m < 0 ? 0 : (m > 1 ? 1 : m);
+      float heard = coupling * 2.0f;                  // fade in as the peer's signal firms up
+      heard = heard > 1 ? 1 : heard;
+      for (int k = 0; k < 3; k++) {
+        float phaseCol = LOCKED[k] + (APART[k] - LOCKED[k]) * m;
+        rgb[k] = ALONE[k] + (phaseCol - ALONE[k]) * heard;
+      }
+    } else {
+      rgb[0] = 1.0f;
+      rgb[1] = 0.18f * fear;                          // hotter when afraid
+      rgb[2] = 0.0f;
+    }
+    uint8_t out[3];
+    for (int k = 0; k < 3; k++) {
+      float x = v * peak * rgb[k];
+      if (rgb[k] > 0.2f && x < 1.0f) x = 1.0f;        // faint ember between beats
+      out[k] = (uint8_t)x;
+    }
+    uint32_t c = ring.Color(out[0], out[1], out[2]);
     for (int i = 0; i < RING_COUNTS[r]; i++) ring.setPixelColor(RING_START[r] + i, c);
   }
   ring.show();
@@ -428,9 +466,28 @@ static void hueColour(float x, float rgb[3]) {  // 0 blue -> 0.5 green -> 1 red
   }
 }
 
+// Output: trail values are perceptual (0..1 lightness); LEDs get gamma 2.2 so equal
+// steps look equal, with per-LED temporal dithering so faint tails fade smoothly
+// instead of stepping to black at the bottom of the 8-bit range.
+static const float RADAR_GAMMA = 2.2f;
+static float ditherErr[LED_RING_COUNT][3];
+
+static uint8_t perceptualOut(int i, int c, float v) {
+  v = v < 0 ? 0 : (v > 1 ? 1 : v);
+  float x = powf(v, RADAR_GAMMA) * SOUND_PEAK + ditherErr[i][c];
+  int o = (int)x;
+  if (o < 0) o = 0;
+  if (o > 255) o = 255;
+  ditherErr[i][c] = x - o;
+  return (uint8_t)o;
+}
+
+static float radarLoudness();
+static bool radarHue(float rgb[3]);
+
 static void soundRender(float dt) {
   // Continuous loudness with instant attack and a short release.
-  float x = loudness();
+  float x = radarLoudness();
   loudEnv = (x > loudEnv) ? x : loudEnv * expf(-dt / ENV_RELEASE_S);
 
   float sweep = 360.0f * dt / SWEEP_S;
@@ -438,7 +495,7 @@ static void soundRender(float dt) {
   beamDeg = fmodf(beamDeg - sweep + 360.0f, 360.0f);  // clockwise
   float fade = expf(-dt / TRAIL_TAU_S);
   float rgb[3];
-  hueColour(loudEnv, rgb);
+  if (!radarHue(rgb) || !autoGain) hueColour(loudEnv, rgb);  // fixed gain: loudness colours
 
   for (int r = 0; r < 3; r++) {
     // Radial reach: this ring ramps in over its third of the loudness range.
@@ -458,12 +515,9 @@ static void soundRender(float dt) {
       }
       // A faint beam head so the sweep is visible in silence.
       float head = 0.0f;
-      if (behind < 20.0f) head = 0.06f * (1.0f - behind / 20.0f);
+      if (behind < 20.0f) head = 0.22f * (1.0f - behind / 20.0f);
       uint8_t out[3];
-      for (int c = 0; c < 3; c++) {
-        float v = trail[i][c] + head * 0.6f;
-        out[c] = (uint8_t)((v > 1 ? 1 : v) * SOUND_PEAK);
-      }
+      for (int c = 0; c < 3; c++) out[c] = perceptualOut(i, c, trail[i][c] + head * 0.6f);
       ring.setPixelColor(i, out[0], out[1], out[2]);
     }
   }
@@ -484,8 +538,9 @@ struct Follower {
   void update(float v, float dt) {
     if (!primed) { lo = v; hi = v + 1.5f; primed = true; }
     lo += (1.0f - expf(-dt / (v < lo ? 0.3f : 10.0f))) * (v - lo);
-    hi += (1.0f - expf(-dt / (v > hi ? 0.3f : 10.0f))) * (v - hi);
-    if (hi < lo + 1.5f) hi = lo + 1.5f;
+    hi += (1.0f - expf(-dt / (v > hi ? 0.5f : 4.0f))) * (v - hi);
+    if (hi < lo + 1.5f) hi = lo + 1.5f;   // min span: quiet stays dark
+    if (hi > lo + 4.5f) hi = lo + 4.5f;   // max span: one bang can't park the ceiling high
   }
   float norm(float v) const {
     float x = (v - lo) / (hi - lo);
@@ -493,27 +548,69 @@ struct Follower {
   }
 };
 static Follower groupGain[3];       // bass, mids, treble
+static Follower loudGain;           // whole-spectrum loudness
+static float specLoud = 0.0f;       // 0..1 auto-ranged perceptual loudness
+// Timbre colour: spectral centroid over the auto-ranged mel bands, 0 dark .. 1 bright.
+static float bandFloor[BeatDetector::BANDS];
+static bool bandFloorPrimed = false;
+static float curC = 0.3f;           // now (~0.1 s smoothing)
+static float moodC = 0.3f;          // mood (~3 s smoothing)
+static float beatC = 0.3f;          // the latest beat's colour
+static float pulseC[6];             // colour of each ripple
+static float cLo = 0.3f, cHi = 0.6f;  // auto-range of the timbre (darkest / brightest lately)
+
+// Timbre auto-ranged to 0..1 over what has been heard in the last ~15 s, so any music
+// uses the whole palette.
+static float timbreNorm(float c) {
+  float x = (c - cLo) / (cHi - cLo);
+  return x < 0 ? 0 : (x > 1 ? 1 : x);
+}
 static float groupLevel[3] = {0, 0, 0};
+static float groupRaw[3] = {0, 0, 0};    // latest group log energy (debug)
+static uint32_t analysisFrames = 0;      // spectral frames analysed (debug: rate)
 static const float GROUP_EDGES_HZ[2] = {250.0f, 2000.0f};
-static const uint8_t AMBIENT_PEAK = 14;
-static const uint8_t BEAT_PEAK = 50;
+
+// Radar helpers (declared before soundRender).
+static float radarLoudness() { return autoGain ? specLoud : loudness(); }
+
+// Colour from the balance of bass / mids / treble (after audio-reactive-led-strip's
+// scroll effect: red = lows, green = mids, blue = highs), each auto-ranged and squared
+// so the dominant band wins; normalised so the strongest channel is 1.
+static bool radarHue(float rgb[3]) {
+  float b = groupLevel[0] * groupLevel[0], m = groupLevel[1] * groupLevel[1],
+        t = groupLevel[2] * groupLevel[2];
+  float mx = fmaxf(b, fmaxf(m, t));
+  if (mx < 0.02f) return false;
+  rgb[0] = b / mx;
+  rgb[1] = m / mx;
+  rgb[2] = t / mx;
+  return true;
+}
 
 static void beatFeed(const int16_t* samples, int n) {
   memcpy(audioCopy, samples, n * sizeof(int16_t));
   // Gate: no onsets from room noise (the level must be ~2x the background floor).
   bool gate = levelLog > floorLog + 0.7f;
   if (beats.push(audioCopy, n, gate)) {
-    beatAnalysed(BeatDetector::HOP / 16000.0f);
-    if (beats.onset) {
+    static uint32_t lastAnalysisMs = 0;
+    uint32_t nowMs = millis();
+    float dtA = lastAnalysisMs ? (nowMs - lastAnalysisMs) / 1000.0f : BeatDetector::HOP / 16000.0f;
+    if (dtA > 0.1f) dtA = 0.1f;
+    lastAnalysisMs = nowMs;
+    analysisFrames++;
+    beatAnalysed(dtA);
+    if (mode == MODE_BEAT && beats.onset) {
       onsetCount++;
       float strength = 0.5f + 0.25f * (beats.onsetStrength - 1.0f);
       strength = strength < 0.5f ? 0.5f : (strength > 1.0f ? 1.0f : strength);
+      beatC = timbreNorm(curC);  // this hit's timbre colours its ripple
       if (tempo.onOnset(millis())) beatPulse(strength);
     }
   }
 }
 
 static void beatPulse(float strength) {
+  pulseC[pulseHead] = beatC;  // predicted beats reuse the last hit's colour
   pulses[pulseHead] = {millis(), strength};
   pulseHead = (pulseHead + 1) % 6;
 }
@@ -526,43 +623,97 @@ static void beatAnalysed(float dt) {
     sum[g] += beats.logMel[b];
     cnt[g]++;
   }
+  // Perceptual loudness: mean log energy over the mel bands (a geometric mean, so a
+  // bass rumble doesn't swamp it the way raw RMS does), auto-ranged like the groups.
+  float all = 0;
+  for (int b = 0; b < BeatDetector::BANDS; b++) all += beats.logMel[b];
+  all /= BeatDetector::BANDS;
+  loudGain.update(all, dt);
+  // Spectral centroid of what stands above each band's own floor (so it reflects the
+  // music's timbre, not the mic's fixed tilt), in band index -> 0..1.
+  float wsum = 0, csum = 0;
+  for (int b = 0; b < BeatDetector::BANDS; b++) {
+    float v = beats.logMel[b];
+    if (!bandFloorPrimed) bandFloor[b] = v;
+    bandFloor[b] += (1.0f - expf(-dt / (v < bandFloor[b] ? 0.3f : 10.0f))) * (v - bandFloor[b]);
+    float w = v - bandFloor[b] - 0.3f;
+    if (w > 0) { wsum += w; csum += w * b; }
+  }
+  bandFloorPrimed = true;
+  if (wsum > 0.5f) {
+    float c = csum / wsum / (BeatDetector::BANDS - 1);
+    curC += (1.0f - expf(-dt / 0.1f)) * (c - curC);
+    moodC += (1.0f - expf(-dt / 3.0f)) * (c - moodC);
+    cLo += (1.0f - expf(-dt / (curC < cLo ? 0.5f : 15.0f))) * (curC - cLo);
+    cHi += (1.0f - expf(-dt / (curC > cHi ? 0.5f : 15.0f))) * (curC - cHi);
+    if (cHi < cLo + 0.12f) {  // minimum span, so a steady sound doesn't flash every hue
+      float mid = 0.5f * (cLo + cHi);
+      cLo = mid - 0.06f;
+      cHi = mid + 0.06f;
+    }
+  }
+  float lx = loudGain.norm(all);
+  specLoud = (lx > specLoud) ? lx : specLoud * 0.9f;  // fast rise, quick fall (per 16 ms)
   for (int g = 0; g < 3; g++) {
     float v = cnt[g] ? sum[g] / cnt[g] : 0;
+    groupRaw[g] = v;
     groupGain[g].update(v, dt);
     float x = groupGain[g].norm(v);
     groupLevel[g] = (x > groupLevel[g]) ? x : groupLevel[g] * 0.85f;  // fast rise, quick fall
   }
 }
 
+// Palette: timbre 0 (dark, bassy) .. 1 (bright, hissy) runs the visible spectrum in
+// wavelength order, red -> orange -> yellow -> green -> cyan -> blue -> violet (hue 0 to
+// 275 deg): low sounds long-wavelength colours, high sounds short ones.
+static void paletteRGB(float c, float sat, float rgb[3]) {
+  c = c < 0 ? 0 : (c > 1 ? 1 : c);
+  float h = fmodf(275.0f * c, 360.0f) / 60.0f;
+  int sector = (int)h;
+  float f = h - sector;
+  float p = 1.0f - sat, q = 1.0f - sat * f, t = 1.0f - sat * (1.0f - f);
+  switch (sector) {
+    case 0: rgb[0] = 1; rgb[1] = t; rgb[2] = p; break;
+    case 1: rgb[0] = q; rgb[1] = 1; rgb[2] = p; break;
+    case 2: rgb[0] = p; rgb[1] = 1; rgb[2] = t; break;
+    case 3: rgb[0] = p; rgb[1] = q; rgb[2] = 1; break;
+    case 4: rgb[0] = t; rgb[1] = p; rgb[2] = 1; break;
+    default: rgb[0] = 1; rgb[1] = p; rgb[2] = q; break;
+  }
+}
+
 static void beatRender(uint32_t now) {
-  // Ripple: each beat pulse travels inner -> outer.
   const float ringDelay = 0.05f, attack = 0.015f, tau = 0.12f;
-  float level[3] = {0, 0, 0};
-  for (int p = 0; p < 6; p++) {
-    if (pulses[p].strength <= 0) continue;
-    float age = (now - pulses[p].startMs) / 1000.0f;
-    if (age > 1.5f) {
-      pulses[p].strength = 0;
-      continue;
-    }
-    for (int r = 0; r < 3; r++) {
+  static const int GROUP_FOR_RING[3] = {2, 1, 0};      // inner treble, middle mids, outer bass
+  static const float RING_SHIFT[3] = {0.08f, 0.04f, 0.0f};  // slight hue offset per ring
+  const float AMBIENT = 0.38f;                          // perceptual lightness of the glow
+
+  for (int r = 0; r < 3; r++) {
+    // Mood glow: the slow timbre colour, brightness from this ring's band.
+    float col[3], acc[3];
+    paletteRGB(timbreNorm(moodC) + RING_SHIFT[r], 0.8f, col);
+    float a = AMBIENT * groupLevel[GROUP_FOR_RING[r]];
+    for (int k = 0; k < 3; k++) acc[k] = col[k] * a;
+    // Ripples: each beat's own colour, pale at the crest settling to full colour.
+    for (int p = 0; p < 6; p++) {
+      if (pulses[p].strength <= 0) continue;
+      float age = (now - pulses[p].startMs) / 1000.0f;
+      if (age > 1.5f) {
+        pulses[p].strength = 0;
+        continue;
+      }
       float t = age - r * ringDelay;
       if (t < 0) continue;
       float e = (t < attack) ? t / attack : expf(-(t - attack) / tau);
-      level[r] += pulses[p].strength * e;
+      paletteRGB(pulseC[p] + RING_SHIFT[r], 0.9f - 0.4f * e, col);
+      for (int k = 0; k < 3; k++) acc[k] += col[k] * e * pulses[p].strength;
     }
-  }
-  // Ambient: inner ring = treble (blue), middle = mids (green), outer = bass (red).
-  static const int GROUP_FOR_RING[3] = {2, 1, 0};
-  static const float AMBIENT_RGB[3][3] = {{0, 0, 1}, {0, 1, 0}, {1, 0, 0}};
-  for (int r = 0; r < 3; r++) {
-    float a = groupLevel[GROUP_FOR_RING[r]] * AMBIENT_PEAK;
-    float v = (level[r] > 1 ? 1 : level[r]) * BEAT_PEAK;
-    float rgb[3] = {AMBIENT_RGB[r][0] * a + v, AMBIENT_RGB[r][1] * a + v * 0.55f,
-                    AMBIENT_RGB[r][2] * a + v * 0.25f};
-    uint8_t out[3];
-    for (int c = 0; c < 3; c++) out[c] = (uint8_t)(rgb[c] > 255 ? 255 : rgb[c]);
-    for (int i = 0; i < RING_COUNTS[r]; i++) ring.setPixelColor(RING_START[r] + i, out[0], out[1], out[2]);
+    for (int k = 0; k < 3; k++) acc[k] = acc[k] > 1 ? 1 : acc[k];
+    for (int i = 0; i < RING_COUNTS[r]; i++) {
+      int idx = RING_START[r] + i;
+      ring.setPixelColor(idx, perceptualOut(idx, 0, acc[0]), perceptualOut(idx, 1, acc[1]),
+                         perceptualOut(idx, 2, acc[2]));
+    }
   }
   ring.show();
 }
@@ -596,6 +747,7 @@ static void syncAdvertise() {
 }
 
 static void onScan(ble_gap_evt_adv_report_t* report) {
+  rxAny++;
   uint8_t msd[16];
   uint8_t len = Bluefruit.Scanner.parseReportByType(
       report, BLE_GAP_AD_TYPE_MANUFACTURER_SPECIFIC_DATA, msd, sizeof(msd));
@@ -603,6 +755,8 @@ static void onScan(ble_gap_evt_adv_report_t* report) {
       msd[3] == SYNC_MAGIC[1] && msd[4] == SYNC_VERSION) {
     uint16_t id = getU16(msd + 5);
     if (id != myId) {
+      rxCount++;
+      rxRssi = report->rssi;
       uint32_t now = millis();
       int slot = -1, oldest = 0;
       for (int i = 0; i < MAX_PEERS; i++) {
@@ -632,7 +786,6 @@ static void bleSetup() {
   Bluefruit.Advertising.restartOnDisconnect(false);
   Bluefruit.Scanner.setRxCallback(onScan);
   Bluefruit.Scanner.useActiveScan(false);
-  Bluefruit.Scanner.filterMSD(SYNC_COMPANY_ID);
   Bluefruit.Scanner.setInterval(160, 80);   // 100 ms interval, 50 ms window (room to advertise)
   myId = (uint16_t)(NRF_FICR->DEVICEID[0] & 0xFFFF);
   if (myId == 0) myId = 1;
@@ -640,7 +793,7 @@ static void bleSetup() {
 
 static void bleStart() {
   for (int i = 0; i < MAX_PEERS; i++) peers[i].id = 0;
-  Bluefruit.Scanner.start(0);
+  scanOk = Bluefruit.Scanner.start(0);
   syncAdvertise();
   bleRunning = true;
 }
@@ -687,6 +840,11 @@ static void enterMode(Mode m) {
     for (int p = 0; p < 6; p++) pulses[p].strength = 0;
     tempo = TempoTracker();
     for (int g = 0; g < 3; g++) { groupGain[g] = Follower(); groupLevel[g] = 0; }
+    loudGain = Follower();
+    specLoud = 0;
+    bandFloorPrimed = false;
+    cLo = 0.3f;
+    cHi = 0.6f;
     micStart();
     Serial.println(m == MODE_BEAT ? "mode: BEAT" : "mode: SOUND");
   }
@@ -777,6 +935,11 @@ void loop() {
 
   while (Serial.available()) {
     char c = Serial.read();
+    if (c == 'U') enterUf2Dfu();          // reboot into the FEARBOOT drive (upload.sh)
+    if (c == 'F') enterMode(MODE_FEAR);   // serial mode select (bench testing)
+    if (c == 'S') enterMode(MODE_SOUND);
+    if (c == 'B') enterMode(MODE_BEAT);
+    if (c == 'Y') enterMode(MODE_SYNC);
     if (c == '+') sensitivity *= 0.8f;
     if (c == '-') sensitivity *= 1.25f;
   }
@@ -833,6 +996,15 @@ void loop() {
         Serial.print("  own ");
         Serial.print(ownBpm, 0);
         Serial.print(advOk ? "  adv ok" : "  adv FAIL");
+        Serial.print(scanOk ? "  scan ok" : "  scan FAIL");
+        Serial.print("  any ");
+        Serial.print(rxAny);
+        Serial.print("  heard ");
+        Serial.print(rxCount);
+        Serial.print(" (rssi ");
+        Serial.print(rxRssi);
+        Serial.print(")  err ");
+        Serial.print(phaseErr, 2);
         Serial.print("  peers ");
         Serial.print(peersNear);
         for (int i = 0; i < MAX_PEERS; i++) {

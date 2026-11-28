@@ -5,13 +5,14 @@ definition. Pins come from the frozen GPIO map in `proximity_fear/main.py`.
 
 | Folder | What |
 |---|---|
-| `badge/` | Main firmware. Button cycles FEAR -> SOUND (radar) -> BEAT -> SYNC; long press toggles auto gain. |
+| `badge/` | Main firmware. Button cycles FEAR -> SOUND (radar) -> BEAT -> SYNC; long press toggles auto gain. Serial: `F`/`S`/`B`/`Y` select a mode, `U` reboots into the FEARBOOT drive, `+`/`-` sound sensitivity. |
 | `bringup/` | fw-01 bring-up / hardware test sketch (serial commands, `h` for help). |
 | `fearheart/`, `soundrings/` | Earlier single-mode sketches. |
 | `arduino/` | Board variant (`adafruit:nrf52:proximityfear`) and `install_variant.sh`. |
 | `bootloader/proximity_fear_badge/` | Board files for the Adafruit nRF52 UF2 bootloader. |
 | `scripts/` | `badge_serial.py` (read serial / send commands), `sync_scan.py` (watch SYNC broadcasts from a Mac). |
-| `upload.sh` | Build a sketch and upload it over USB (1200-baud touch + serial DFU). |
+| `upload.sh` | Build a sketch and upload it over USB: reboots the badge into its FEARBOOT drive and copies a UF2 (falls back to 1200-baud touch + serial DFU). `BADGE_PORT=/dev/cu.usbmodemX` picks a badge when several are plugged in. |
+| `flash_bootloader.sh` | Flash the bootloader + SoftDevice over SWD with a J-Link and check the badge enumerates (one step per new board). |
 
 ## Setup (once)
 
