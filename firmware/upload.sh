@@ -21,7 +21,12 @@ waitport() { for i in $(seq 1 50); do P=$(ls /dev/cu.usbmodem* 2>/dev/null | hea
 PORT=${BADGE_PORT:-$(waitport)}
 
 # 1. UF2 drive
-[ -d /Volumes/FEARBOOT ] && { echo "a FEARBOOT drive is already mounted - eject it first"; exit 1; }
+if [ -d /Volumes/FEARBOOT ]; then   # a badge is already waiting in its drive mode: use it
+  cp "$BUILD/$SKETCH.uf2" /Volumes/FEARBOOT/ 2>/dev/null || true
+  for j in $(seq 1 20); do [ -d /Volumes/FEARBOOT ] || break; sleep 0.5; done
+  echo "Device programmed (UF2 via an already-mounted FEARBOOT)."
+  exit 0
+fi
 "$HERE/.venv/bin/python" - "$PORT" <<'PY'
 import sys, serial
 s = serial.Serial(sys.argv[1], 115200, timeout=0.5); s.write(b"U"); s.flush(); s.close()

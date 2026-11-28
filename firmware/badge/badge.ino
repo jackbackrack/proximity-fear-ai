@@ -1,14 +1,17 @@
 // Proximity Fear Badge: main firmware.
 //
 // Board: adafruit:nrf52:proximityfear (firmware/arduino, install_variant.sh).
-// The button steps through four modes, FEAR -> SOUND -> BEAT -> SYNC (starts in FEAR);
-// each mode announces itself with a short flash (red / green / blue / violet):
+// The button steps through four modes, SYNC -> FEAR -> SOUND -> BEAT (starts in SYNC);
+// each mode announces itself with a short flash (violet / red / green / blue). A quick
+// double press restarts sync (forgets the lock, two violet flashes):
 //
 // FEAR (fw-02): the VL53L4CX measures the distance to whoever is in front and the heart
 //   rate rises inversely with it: bpm = REST_BPM + FEAR_K / distance_m (clamped), so
 //   ~180 bpm at 0.3 m, ~90 at 1 m, ~70 at 2 m, ~60 at 4 m, REST_BPM with nobody there.
 //   Each beat is a lub-dub, each pulse radiating inner -> outer ring. Fast to fear,
-//   slow to calm down; continuous beat phase; closer = brighter and hotter.
+//   slow to calm down; continuous beat phase. Purple; closer = brighter and pinker;
+//   closer than 60 cm the rings start to sparkle a little, more and more the closer
+//   someone comes, going wild at 10 cm or less.
 //
 // SOUND: radar. A beam sweeps clockwise once every 1 s; each LED it passes takes the
 //   current loudness (log scale over a tracked background floor) and fades slowly,
@@ -33,13 +36,21 @@
 //   (3 s timbre average) lit by each ring's band (outer bass, middle mids, inner
 //   treble). Gamma 2.2 + dithering as in the radar.
 //
-// SYNC (fw-05): the fear heart, plus badge-to-badge beat sync over BLE. Each badge
+// SYNC (fw-05): badge-to-badge beat sync, face to face over IR (SYNC_BLE = false):
+//   the ToF gates the IR receiver/transmitter on when something is within 2 m; each
+//   beat is sent as a 38 kHz burst after a random 40-160 ms delay that the burst length
+//   encodes; a receiving badge pulls its phase toward the sender's beat, spread over
+//   ~0.25 s so no beat is skipped. Fixed 60 bpm, so badges stay in step out of sight;
+//   once linked, the badge keeps its sync state and colour indefinitely out of sight and
+//   re-syncs when the badges see each other again (magenta only before first contact).
+//   With SYNC_BLE = true (once antennas fit) the BLE version below is used instead:
+//   Each badge
 //   broadcasts its beat phase and bpm in a non-connectable advertisement and listens
 //   for the others (no pairing). Peers in range (weighted by RSSI) pull each other's
 //   phase together (Kuramoto-style coupling). Every badge beats at a fixed SYNC_BPM
 //   (60) here - distance doesn't change the rate - so only the phase has to lock.
-//   Colour: magenta alone; hearing another badge, orange when the beats are a quarter
-//   beat or more apart, blending to blue-violet as they lock into step.
+//   Colour: blue alone; hearing another badge, yellow when the beats are a quarter beat
+//   or more apart, orange closing in, red when locked in step.
 //
 // The sensor a mode doesn't use is idled (ToF ranging stopped with XSHUT high /
 // PDM stopped). USB serial prints status twice a second; '+' / '-' change sound
@@ -66,7 +77,17 @@ Adafruit_NeoPixel ring(LED_RING_COUNT, PIN_LED_DATA, NEO_GRB + NEO_KHZ800);
 VL53L4CX tof(&Wire, PIN_TOF_XSHUT);
 
 enum Mode { MODE_FEAR, MODE_SOUND, MODE_BEAT, MODE_SYNC };
-enum ButtonEvent { BUTTON_NONE, BUTTON_SHORT, BUTTON_LONG };
+enum ButtonEvent { BUTTON_NONE, BUTTON_SHORT, BUTTON_DOUBLE, BUTTON_LONG };
+
+// SYNC peer record (BLE path); defined up here so Arduino's generated prototypes see it.
+struct Peer {
+  uint16_t id;
+  uint32_t rxMs;      // when its last packet arrived
+  float phase;        // its phase when that packet was sent (~ at rxMs)
+  float ownBpm;       // its distance-driven rate
+  float effBpm;       // the rate it is actually beating at
+  int8_t rssi;
+};
 static Mode mode = MODE_FEAR;
 
 // ---- FEAR tuning -----------------------------------------------------------------
@@ -77,7 +98,10 @@ static const float FAR_M = 4.5f;            // treated as "nobody there"
 static const uint32_t LOST_MS = 800;        // no valid target for this long -> far
 static const float APPROACH_ALPHA = 0.5f;   // distance smoothing when coming closer
 static const float RETREAT_ALPHA = 0.06f;   // ... and when moving away (slow calm-down)
-static const uint8_t FEAR_PEAK = 48;        // of 255 at full fear; <= ~115 mA all rings red
+static const uint8_t FEAR_PEAK = 48;        // of 255 at full fear; <= ~115 mA all rings lit
+static const uint8_t SPARK_PEAK = 64;       // of 255, brightest sparkle
+static const float SPARK_START_M = 0.60f;   // a few sparkles begin closer than this
+static const float SPARK_FULL_M = 0.10f;    // ... and go wild at or inside this
 static const float RING_GAIN[3] = {1.0f, 0.85f, 0.7f};
 static const float LUB = 1.0f, DUB = 0.6f;
 
@@ -85,7 +109,6 @@ static const float LUB = 1.0f, DUB = 0.6f;
 static const uint8_t SOUND_PEAK = 56;       // of 255 at full lightness (after gamma 2.2)
 
 // ---- State -----------------------------------------------------------------------
-static bool tofOk = false;
 static float distM = FAR_M;
 static float lastValidM = FAR_M;
 static uint32_t lastValidMs = 0;
@@ -127,6 +150,151 @@ static const uint16_t SYNC_COMPANY_ID = 0xFFFF;  // Bluetooth SIG "test / no com
 static const uint8_t SYNC_MAGIC[2] = {'P', 'F'};
 static const uint8_t SYNC_VERSION = 1;
 static const float SYNC_BPM = 60.0f;        // SYNC beats at this fixed rate (no distance)
+static const bool SYNC_BLE = false;         // BLE beat sync (needs antennas); IR is used instead
+static float tofAnyM = 9.9f;                // nearest target of any status (SYNC presence gate)
+static uint32_t tofAnyMs = 0;
+static bool tofOk = false;
+static void tofStart();
+static void tofStop();
+
+// ---- SYNC over IR ---------------------------------------------------------------
+// Face to face: when the ToF sees something within IR_GATE_M, the IR receiver is powered
+// and each beat is announced with one 38 kHz burst, sent a random 40/80/120/160 ms after
+// the beat with a burst length (500/850/1200/1550 us) that says which delay was used.
+// A receiving badge subtracts that delay to get the sender's beat time. The random delay
+// keeps two locked badges from always transmitting at the same instant (each ignores its
+// receiver while it transmits, so identical timing would make them deaf to each other).
+static const float IR_GATE_M = 2.0f;
+static const uint16_t IR_DELAY_MS[4] = {40, 80, 120, 160};
+static const uint16_t IR_BURST_US[4] = {500, 850, 1200, 1550};
+static const float IR_COUPLING = 0.4f;      // phase correction per received beat
+static const uint32_t IR_HEARD_MS = 3000;   // a peer counts as present this long after a beat
+static float irPendingCorr = 0.0f;          // phase correction still to apply (spread smoothly)
+static uint32_t irPrevPeerBeat = 0;         // last candidate peer beat time (for the rhythm check)
+static uint32_t irImplausible = 0;          // bursts dropped by the rhythm check
+
+static bool irGateOn = false;
+static bool irTofPaused = false;     // ToF stopped while the IR link is up
+static uint32_t irLastBeatSeen = 0;         // beatStartMs already handled
+static uint32_t irTxDueMs = 0;
+static int irTxSlot = -1;
+static volatile uint32_t irBlankUntilUs = 0;
+static volatile uint32_t irFallUs = 0;
+struct IrEvent { uint32_t ms; uint8_t slot; };
+static volatile IrEvent irEvents[4];
+static volatile uint8_t irHead = 0, irTail = 0;
+static uint32_t irRxCount = 0, irTxCount = 0, irLastHeardMs = 0;
+static volatile uint32_t irLastWidth = 0, irRejected = 0;
+static uint16_t irSeq[1] = {210 | 0x8000};  // PWM2 duty: 50 % of 421 counts
+
+static void irCarrier(bool on) {               // 38 kHz on PWM2 (16 MHz / 421)
+  if (on) {
+    NRF_PWM2->PSEL.OUT[0] = PIN_IR_TX;
+    NRF_PWM2->MODE = PWM_MODE_UPDOWN_Up;
+    NRF_PWM2->PRESCALER = PWM_PRESCALER_PRESCALER_DIV_1;
+    NRF_PWM2->COUNTERTOP = 421;
+    NRF_PWM2->LOOP = 0;
+    NRF_PWM2->DECODER = PWM_DECODER_LOAD_Common | PWM_DECODER_MODE_RefreshCount;
+    NRF_PWM2->SEQ[0].PTR = (uint32_t)irSeq;
+    NRF_PWM2->SEQ[0].CNT = 1;
+    NRF_PWM2->SEQ[0].REFRESH = 0;
+    NRF_PWM2->SEQ[0].ENDDELAY = 0;
+    NRF_PWM2->ENABLE = 1;
+    NRF_PWM2->TASKS_SEQSTART[0] = 1;
+  } else {
+    NRF_PWM2->TASKS_STOP = 1;
+    delayMicroseconds(20);
+    NRF_PWM2->ENABLE = 0;
+    NRF_PWM2->PSEL.OUT[0] = 0xFFFFFFFFUL;
+    digitalWrite(PIN_IR_TX, LOW);
+  }
+}
+
+static void onIrChange() {                     // receiver output is active low
+  uint32_t us = micros();
+  if (digitalRead(PIN_IR_RX) == LOW) {
+    irFallUs = us;
+    return;
+  }
+  if ((int32_t)(us - irBlankUntilUs) < 0) return;  // our own burst (or its reflection)
+  uint32_t w = us - irFallUs;
+  irLastWidth = w;
+  int slot = -1;                               // must match one of our burst lengths
+  for (int k = 0; k < 4; k++) {
+    if ((int32_t)w > IR_BURST_US[k] - 175 && (int32_t)w < IR_BURST_US[k] + 175) slot = k;
+  }
+  if (slot < 0) {
+    irRejected++;
+    return;
+  }
+  uint8_t next = (irHead + 1) % 4;
+  if (next == irTail) return;
+  irEvents[irHead].ms = millis();
+  irEvents[irHead].slot = slot;
+  irHead = next;
+}
+
+static void irRxPower(bool on) {
+  if (on) {
+    digitalWrite(PIN_IR_RX_EN, LOW);           // receiver supply on
+    delay(2);
+    pinMode(PIN_IR_RX, INPUT_PULLUP);
+    irBlankUntilUs = micros() + 100000;        // ignore power-up glitches for 100 ms
+    attachInterrupt(digitalPinToInterrupt(PIN_IR_RX), onIrChange, CHANGE);
+  } else {
+    detachInterrupt(digitalPinToInterrupt(PIN_IR_RX));
+    pinMode(PIN_IR_RX, INPUT);                 // no pull before the supply goes off
+    digitalWrite(PIN_IR_RX_EN, HIGH);          // receiver off
+  }
+}
+
+static void irSyncStop() {
+  irTofPaused = false;
+  if (irGateOn) irRxPower(false);
+  irGateOn = false;
+  irTxSlot = -1;
+  irCarrier(false);
+}
+
+// Called every loop in SYNC: gate on the ToF, schedule and send this beat's burst.
+static void irSyncTick(uint32_t now, uint32_t beatMs) {
+  // Gate: on when the ToF sees anything within IR_GATE_M (any status - two facing
+  // badges' ToF lasers jam each other's "valid" readings) or a peer's IR beat has been
+  // heard in the last 5 s; off 3 s after neither.
+  static uint32_t lastSeenMs = 0;
+  bool peerHeard = irLastHeardMs && (now - irLastHeardMs < 5000);
+  if (((now - tofAnyMs < 500) && tofAnyM < IR_GATE_M) || peerHeard) lastSeenMs = now;
+  bool someone = lastSeenMs && (now - lastSeenMs < 3000);
+  if (someone != irGateOn) {
+    irGateOn = someone;
+    irRxPower(someone);
+    irTxSlot = -1;
+  }
+  // While the IR link is up the ToF isn't needed: stop its laser so it doesn't jam the
+  // other badge's IR receiver and ToF (and save power); restart it when the link drops.
+  if (peerHeard && !irTofPaused) {
+    tofStop();
+    irTofPaused = true;
+  } else if (!peerHeard && irTofPaused) {
+    tofStart();
+    irTofPaused = false;
+  }
+  if (!irGateOn) return;
+  if (beatMs != irLastBeatSeen) {              // a new beat: pick this beat's delay slot
+    irLastBeatSeen = beatMs;
+    irTxSlot = random(4);
+    irTxDueMs = beatMs + IR_DELAY_MS[irTxSlot];
+  }
+  if (irTxSlot >= 0 && (int32_t)(now - irTxDueMs) >= 0) {
+    uint16_t w = IR_BURST_US[irTxSlot];
+    irBlankUntilUs = micros() + w + 15000;     // ignore our own burst, its echo and the receiver's recovery
+    irCarrier(true);
+    delayMicroseconds(w);
+    irCarrier(false);
+    irTxCount++;
+    irTxSlot = -1;
+  }
+}
 static const uint32_t SYNC_TX_MS = 60;      // re-stamp and re-advertise this often
 static const uint32_t PEER_TIMEOUT_MS = 1500;
 static const int8_t RSSI_FAR = -105;        // weight 0 at or below this (no antennas yet)
@@ -134,14 +302,6 @@ static const int8_t RSSI_NEAR = -65;        // weight 1 at or above this
 static const float PHASE_COUPLING = 2.0f;   // 1/s per unit weight
 static const uint8_t MAX_PEERS = 8;
 
-struct Peer {
-  uint16_t id;
-  uint32_t rxMs;      // when its last packet arrived
-  float phase;        // its phase when that packet was sent (~ at rxMs)
-  float ownBpm;       // its distance-driven rate
-  float effBpm;       // the rate it is actually beating at
-  int8_t rssi;
-};
 static Peer peers[MAX_PEERS];
 static uint16_t myId = 0;
 static float ownBpm = REST_BPM;   // this badge's distance-driven rate
@@ -151,6 +311,9 @@ static int peersNear = 0;
 static bool bleRunning = false;
 static bool advOk = false;
 static volatile uint32_t rxAny = 0;    // every advertising report the scanner delivers
+static volatile uint32_t rxAnyMs = 0;  // when the last one arrived
+static volatile uint32_t resumeFails = 0;
+static uint32_t scanRestarts = 0;
 static bool scanOk = false;
 static volatile uint32_t rxCount = 0;  // SYNC packets heard from any peer
 static volatile int8_t rxRssi = 0;      // signal strength of the latest one
@@ -211,6 +374,11 @@ static void tofPoll() {
   if (tof.VL53L4CX_GetMultiRangingData(&data) == 0) {
     int nearest = -1;
     for (int j = 0; j < data.NumberOfObjectsFound; j++) {
+      int mm = data.RangeData[j].RangeMilliMeter;  // presence (SYNC gate): any status
+      if (mm > 20 && mm < 2000) {
+        tofAnyM = mm / 1000.0f;
+        tofAnyMs = millis();
+      }
       if (data.RangeData[j].RangeStatus == 0 &&
           (nearest < 0 || data.RangeData[j].RangeMilliMeter < nearest)) {
         nearest = data.RangeData[j].RangeMilliMeter;
@@ -322,7 +490,41 @@ static void fearUpdate(float dt, uint32_t now, bool sync) {
   float phasePull = 0.0f;
   coupling = 0.0f;
   peersNear = 0;
-  if (sync) {
+  if (sync && !SYNC_BLE) {
+    // IR: each received burst is a peer's beat (its delay slot subtracted). Correct the
+    // phase toward it once per burst; the colour uses the smoothed size of the error.
+    float period0 = 60.0f / SYNC_BPM;
+    while (irTail != irHead) {
+      uint32_t ms = irEvents[irTail].ms;
+      uint8_t slot = irEvents[irTail].slot;
+      irTail = (irTail + 1) % 4;
+      uint32_t peerBeat = ms - IR_DELAY_MS[slot];
+      // Rhythm check: a real partner's beats come a whole number of periods apart
+      // (+-80 ms); stray pulses (e.g. our own ToF laser's reflections) don't.
+      uint32_t prev = irPrevPeerBeat;
+      irPrevPeerBeat = peerBeat;
+      uint32_t periodMs = (uint32_t)(period0 * 1000.0f);
+      int32_t gap = (int32_t)(peerBeat - prev);
+      int32_t nearestMul = (gap + (int32_t)periodMs / 2) / (int32_t)periodMs;
+      if (prev == 0 || gap <= 0 || nearestMul < 1 || nearestMul > 8 ||
+          labs(gap - nearestMul * (int32_t)periodMs) > 80) {
+        irImplausible++;
+        continue;
+      }
+      float myPhaseAtPeerBeat = phase - (now - peerBeat) / 1000.0f / period0;
+      float d = wrapHalf(0.0f - myPhaseAtPeerBeat - irPendingCorr);  // + : the peer is ahead
+      irPendingCorr += IR_COUPLING * d;            // applied gradually below: no skipped beats
+      phaseErr += 0.5f * (fabsf(d) - phaseErr);
+      irRxCount++;
+      irLastHeardMs = now;
+    }
+    if (irLastHeardMs) {
+      uint32_t since = now - irLastHeardMs;
+      coupling = 1.0f;          // once linked, stay in the synced state (and colour) even
+      if (since < IR_HEARD_MS)  // out of sight; seeing each other again just re-syncs
+        peersNear = 1;
+    }
+  } else if (sync) {
     float wSum = 1.0f, bpmSum = ownBpm, errSum = 0.0f;
     for (int i = 0; i < MAX_PEERS; i++) {
       float w = peerWeight(peers[i], now);
@@ -344,6 +546,15 @@ static void fearUpdate(float dt, uint32_t now, bool sync) {
   }
 
   float period = 60.0f / bpm;
+  if (sync && !SYNC_BLE && irPendingCorr != 0.0f) {
+    // Spread IR corrections over ~0.25 s: the heart briefly speeds up or slows down
+    // instead of jumping, so a forward correction can't skip a beat.
+    float step = irPendingCorr * (1.0f - expf(-dt / 0.25f));
+    if (phase + step < 0.0f) step = -phase;        // never back up past the last beat
+    phase += step;
+    irPendingCorr -= step;
+    if (fabsf(irPendingCorr) < 0.0005f) irPendingCorr = 0.0f;
+  }
   phase += dt / period + dt * PHASE_COUPLING * phasePull;
   if (phase < 0.0f) phase += 1.0f;  // pulled back past the beat: no extra beat
   if (phase >= 1.0f) {
@@ -384,37 +595,65 @@ static void fearRender(uint32_t now) {
     }
   }
 
+  // Sparkle (FEAR): on top of the racing heart, random LEDs twinkle once someone is
+  // closer than SPARK_START_M, more and more of them the closer they come. Each spark
+  // flashes up and fades over ~0.15 s.
+  static float sparkle[LED_RING_COUNT];
+  static uint32_t lastRenderMs = 0;
+  float dtR = lastRenderMs ? (now - lastRenderMs) / 1000.0f : 0.01f;
+  if (dtR > 0.1f) dtR = 0.1f;
+  lastRenderMs = now;
+  float spark = (mode == MODE_FEAR) ? (SPARK_START_M - distM) / (SPARK_START_M - SPARK_FULL_M) : 0.0f;
+  spark = spark < 0 ? 0 : (spark > 1 ? 1 : spark);
+  float sparkDecay = expf(-dtR / 0.15f);
+  // Across all 50 LEDs: a light scatter (~12/s) just inside 60 cm, rising steeply to
+  // ~400/s (8 per LED per second) at 10 cm and closer.
+  bool inRange = (mode == MODE_FEAR) && distM < SPARK_START_M;
+  float sparksPerSecond = inRange ? 400.0f * (0.03f + 0.97f * spark * spark) : 0.0f;
+  for (int i = 0; i < LED_RING_COUNT; i++) {
+    sparkle[i] *= sparkDecay;
+    if (random(100000) < (long)(sparksPerSecond * dtR / LED_RING_COUNT * 100000.0f))
+      sparkle[i] = 0.6f + random(400) / 1000.0f;
+  }
+
   float peak = FEAR_PEAK * (0.45f + 0.55f * fear);
   for (int r = 0; r < 3; r++) {
     float v = level[r] > 1.0f ? 1.0f : level[r];
     float rgb[3];
     if (mode == MODE_SYNC) {
-      // Alone: magenta. Hearing another badge: the colour shows how far apart the beats
-      // are - orange when a quarter beat or more apart, through to blue-violet in step.
-      static const float ALONE[3] = {1.0f, 0.0f, 0.35f};
-      static const float APART[3] = {1.0f, 0.45f, 0.0f};
-      static const float LOCKED[3] = {0.35f, 0.25f, 1.0f};
+      // Alone: blue. Hearing another badge, the colour shows how far apart the beats
+      // are: yellow when a quarter beat or more apart, orange closing in, red in step.
+      static const float ALONE[3] = {0.0f, 0.15f, 1.0f};
+      static const float APART[3] = {1.0f, 0.75f, 0.0f};   // yellow
+      static const float NEAR[3] = {1.0f, 0.30f, 0.0f};    // orange
+      static const float LOCKED[3] = {1.0f, 0.0f, 0.0f};   // red
       float m = phaseErr / 0.25f;                     // 0 in step .. 1 a quarter beat or more
       m = m < 0 ? 0 : (m > 1 ? 1 : m);
       float heard = coupling * 2.0f;                  // fade in as the peer's signal firms up
       heard = heard > 1 ? 1 : heard;
       for (int k = 0; k < 3; k++) {
-        float phaseCol = LOCKED[k] + (APART[k] - LOCKED[k]) * m;
+        float phaseCol = (m < 0.5f) ? LOCKED[k] + (NEAR[k] - LOCKED[k]) * (m / 0.5f)
+                                    : NEAR[k] + (APART[k] - NEAR[k]) * ((m - 0.5f) / 0.5f);
         rgb[k] = ALONE[k] + (phaseCol - ALONE[k]) * heard;
       }
     } else {
-      rgb[0] = 1.0f;
-      rgb[1] = 0.18f * fear;                          // hotter when afraid
-      rgb[2] = 0.0f;
+      // FEAR: purple, a little hotter (pinker) when afraid.
+      rgb[0] = 0.55f + 0.25f * fear;
+      rgb[1] = 0.0f;
+      rgb[2] = 1.0f - 0.2f * fear;
     }
-    uint8_t out[3];
+    uint8_t base[3];
     for (int k = 0; k < 3; k++) {
       float x = v * peak * rgb[k];
       if (rgb[k] > 0.2f && x < 1.0f) x = 1.0f;        // faint ember between beats
-      out[k] = (uint8_t)x;
+      base[k] = (uint8_t)x;
     }
-    uint32_t c = ring.Color(out[0], out[1], out[2]);
-    for (int i = 0; i < RING_COUNTS[r]; i++) ring.setPixelColor(RING_START[r] + i, c);
+    for (int i = 0; i < RING_COUNTS[r]; i++) {
+      int idx = RING_START[r] + i;
+      float sp = sparkle[idx] * SPARK_PEAK;           // lavender-white sparks on top
+      int c0 = base[0] + (int)(sp * 1.0f), c1 = base[1] + (int)(sp * 0.75f), c2 = base[2] + (int)(sp * 1.0f);
+      ring.setPixelColor(idx, c0 > 255 ? 255 : c0, c1 > 255 ? 255 : c1, c2 > 255 ? 255 : c2);
+    }
   }
   ring.show();
 }
@@ -748,6 +987,7 @@ static void syncAdvertise() {
 
 static void onScan(ble_gap_evt_adv_report_t* report) {
   rxAny++;
+  rxAnyMs = millis();
   uint8_t msd[16];
   uint8_t len = Bluefruit.Scanner.parseReportByType(
       report, BLE_GAP_AD_TYPE_MANUFACTURER_SPECIFIC_DATA, msd, sizeof(msd));
@@ -773,13 +1013,13 @@ static void onScan(ble_gap_evt_adv_report_t* report) {
       p.rssi = report->rssi;
     }
   }
-  Bluefruit.Scanner.resume();  // the library pauses scanning after each report
+  if (!Bluefruit.Scanner.resume()) resumeFails++;  // the library pauses scanning after each report
 }
 
 static void bleSetup() {
   Bluefruit.autoConnLed(false);
   Bluefruit.begin(1, 1);
-  Bluefruit.setTxPower(4);
+  Bluefruit.setTxPower(0);  // raised to +8 dBm only while SYNC runs (bleStart)
   Bluefruit.setName("PF Badge");
   Bluefruit.Advertising.setType(BLE_GAP_ADV_TYPE_NONCONNECTABLE_NONSCANNABLE_UNDIRECTED);
   Bluefruit.Advertising.setInterval(32, 32);    // 20 ms (0.625 ms units); restamped every 60 ms
@@ -792,8 +1032,11 @@ static void bleSetup() {
 }
 
 static void bleStart() {
+  Bluefruit.setTxPower(8);  // nRF52840 maximum, +8 dBm: badges reach each other without antennas
   for (int i = 0; i < MAX_PEERS; i++) peers[i].id = 0;
+  Bluefruit.Scanner.stop();  // clear any scan left over from a previous SYNC session
   scanOk = Bluefruit.Scanner.start(0);
+  rxAnyMs = millis();
   syncAdvertise();
   bleRunning = true;
 }
@@ -802,6 +1045,7 @@ static void bleStop() {
   if (!bleRunning) return;
   Bluefruit.Scanner.stop();
   Bluefruit.Advertising.stop();
+  Bluefruit.setTxPower(0);
   bleRunning = false;
   coupling = 0;
   peersNear = 0;
@@ -819,7 +1063,10 @@ static void modeFlash(uint8_t r, uint8_t g, uint8_t b) {
 
 static void enterMode(Mode m) {
   mode = m;
-  if (m != MODE_SYNC) bleStop();
+  if (m != MODE_SYNC) {
+    bleStop();
+    irSyncStop();
+  }
   if (m == MODE_FEAR) modeFlash(24, 0, 0);
   else if (m == MODE_SOUND) modeFlash(0, 24, 0);
   else if (m == MODE_BEAT) modeFlash(0, 0, 24);
@@ -832,7 +1079,8 @@ static void enterMode(Mode m) {
     phase = 0.9f;  // first beat comes almost at once
     for (int p = 0; p < 6; p++) pulses[p].strength = 0;
     tofStart();
-    if (m == MODE_SYNC) bleStart();
+    if (m == MODE_SYNC && SYNC_BLE) bleStart();
+    if (m == MODE_SYNC) { irLastHeardMs = 0; phaseErr = 0; irPendingCorr = 0; irPrevPeerBeat = 0; }
     Serial.println(m == MODE_SYNC ? "mode: SYNC" : "mode: FEAR");
   } else {
     tofStop();
@@ -852,12 +1100,36 @@ static void enterMode(Mode m) {
 
 static const uint32_t LONG_PRESS_MS = 800;
 
-// Debounced: SHORT on release of a press under LONG_PRESS_MS; LONG once, while still
-// held, when the press reaches LONG_PRESS_MS (its release is then ignored).
+static const uint32_t DOUBLE_GAP_MS = 350;
+
+// Double press: start SYNC afresh - forget any lock, jump to a random point in the beat
+// (so the re-sync is visible), back to magenta until a partner is heard again.
+static void syncRestart() {
+  if (mode != MODE_SYNC) enterMode(MODE_SYNC);
+  irLastHeardMs = 0;
+  phaseErr = 0;
+  irPendingCorr = 0;
+  irPrevPeerBeat = 0;
+  phase = random(1000) / 1000.0f;
+  for (int i = 0; i < LED_RING_COUNT; i++) ring.setPixelColor(i, 16, 0, 24);  // violet flash x2
+  for (int k = 0; k < 2; k++) {
+    for (int i = 0; i < LED_RING_COUNT; i++) ring.setPixelColor(i, 16, 0, 24);
+    ring.show();
+    delay(120);
+    ring.clear();
+    ring.show();
+    delay(120);
+  }
+  Serial.println("sync: restarted");
+}
+
+// Debounced: a short press is reported as SHORT once DOUBLE_GAP_MS passes with no second
+// press, or as DOUBLE if a second short press starts within that gap; LONG once, while
+// still held, when a press reaches LONG_PRESS_MS (its release is then ignored).
 static ButtonEvent buttonEvent(uint32_t now) {
   static int stable = HIGH, lastRaw = HIGH;
-  static uint32_t changedMs = 0, pressedMs = 0;
-  static bool longSent = false;
+  static uint32_t changedMs = 0, pressedMs = 0, releasedMs = 0;
+  static bool longSent = false, shortPending = false;
   int raw = digitalRead(PIN_USER_BUTTON);
   if (raw != lastRaw) {
     lastRaw = raw;
@@ -869,11 +1141,21 @@ static ButtonEvent buttonEvent(uint32_t now) {
       pressedMs = now;
       longSent = false;
     } else if (!longSent) {
-      return BUTTON_SHORT;
+      if (shortPending && now - releasedMs < DOUBLE_GAP_MS + (now - pressedMs)) {
+        shortPending = false;
+        return BUTTON_DOUBLE;
+      }
+      shortPending = true;
+      releasedMs = now;
     }
+  }
+  if (shortPending && stable == HIGH && now - releasedMs >= DOUBLE_GAP_MS) {
+    shortPending = false;
+    return BUTTON_SHORT;
   }
   if (stable == LOW && !longSent && now - pressedMs >= LONG_PRESS_MS) {
     longSent = true;
+    shortPending = false;  // a long press cancels a pending single press
     return BUTTON_LONG;
   }
   return BUTTON_NONE;
@@ -917,7 +1199,7 @@ void setup() {
   tofInit();
   bleSetup();
   chargeRule();
-  enterMode(MODE_FEAR);
+  enterMode(MODE_SYNC);
 }
 
 void loop() {
@@ -926,8 +1208,10 @@ void loop() {
 
   ButtonEvent ev = buttonEvent(now);
   if (ev == BUTTON_SHORT) {
-    enterMode(mode == MODE_FEAR ? MODE_SOUND : mode == MODE_SOUND ? MODE_BEAT
-              : mode == MODE_BEAT ? MODE_SYNC : MODE_FEAR);
+    enterMode(mode == MODE_SYNC ? MODE_FEAR : mode == MODE_FEAR ? MODE_SOUND
+              : mode == MODE_SOUND ? MODE_BEAT : MODE_SYNC);
+  } else if (ev == BUTTON_DOUBLE) {
+    syncRestart();
   } else if (ev == BUTTON_LONG) {
     autoGain = !autoGain;
     gainFlash();
@@ -960,10 +1244,19 @@ void loop() {
       fearRender(now);
     }
   }
+  if (mode == MODE_SYNC && !SYNC_BLE) irSyncTick(now, beatStartMs);
   static uint32_t lastTx = 0;
-  if (mode == MODE_SYNC && now - lastTx >= SYNC_TX_MS) {
+  if (mode == MODE_SYNC && SYNC_BLE && now - lastTx >= SYNC_TX_MS) {
     lastTx = now;
     syncAdvertise();
+  }
+  // Scan watchdog: if nothing at all has been heard for 2 s, listening has stalled
+  // (a missed resume leaves it paused for good) - restart it.
+  if (mode == MODE_SYNC && SYNC_BLE && (int32_t)(millis() - rxAnyMs) > 2000) {  // signed: rxAnyMs is set from the BLE task
+    Bluefruit.Scanner.stop();
+    scanOk = Bluefruit.Scanner.start(0);
+    rxAnyMs = millis();
+    scanRestarts++;
   }
   if (now - lastCharge >= 1000) {
     lastCharge = now;
@@ -992,13 +1285,32 @@ void loop() {
       else { Serial.print(distM, 2); Serial.print(" m"); }
       Serial.print("  bpm ");
       Serial.print(bpm, 0);
-      if (mode == MODE_SYNC) {
+      if (mode == MODE_SYNC && !SYNC_BLE) {
+        Serial.print(irGateOn ? "  IR on" : "  IR off (nobody within 2 m)");
+        Serial.print("  tx ");
+        Serial.print(irTxCount);
+        Serial.print("  rx ");
+        Serial.print(irRxCount);
+        Serial.print("  rejected ");
+        Serial.print(irRejected);
+        Serial.print("  off-rhythm ");
+        Serial.print(irImplausible);
+        Serial.print("  last width ");
+        Serial.print(irLastWidth);
+        Serial.print("  err ");
+        Serial.print(phaseErr, 2);
+        Serial.print(peersNear ? "  peer: yes" : "  peer: no");
+      } else if (mode == MODE_SYNC) {
         Serial.print("  own ");
         Serial.print(ownBpm, 0);
         Serial.print(advOk ? "  adv ok" : "  adv FAIL");
         Serial.print(scanOk ? "  scan ok" : "  scan FAIL");
         Serial.print("  any ");
         Serial.print(rxAny);
+        Serial.print("  resume-fail ");
+        Serial.print(resumeFails);
+        Serial.print("  restarts ");
+        Serial.print(scanRestarts);
         Serial.print("  heard ");
         Serial.print(rxCount);
         Serial.print(" (rssi ");
